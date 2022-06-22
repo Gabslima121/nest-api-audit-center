@@ -1,3 +1,5 @@
+import { Role } from '../role/role.entity';
+
 interface CreateUserDTO {
   name: string;
   email: string;
@@ -5,6 +7,7 @@ interface CreateUserDTO {
   cpf: string;
   avatar?: string;
   isDeleted?: boolean;
+  roleId: string;
 }
 
 export { CreateUserDTO };

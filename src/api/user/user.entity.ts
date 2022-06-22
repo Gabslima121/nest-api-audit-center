@@ -5,8 +5,11 @@ import {
   UpdateDateColumn,
   Column,
   DeleteDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { Role } from '../role/role.entity';
 
 @Entity('users')
 class User {
@@ -39,6 +42,20 @@ class User {
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: Date;
+
+  @ManyToMany((type) => Role, (role) => role.users)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'id',
+    },
+  })
+  roles?: Role[];
 
   constructor() {
     if (!this.id) {
