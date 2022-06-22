@@ -7,7 +7,7 @@ interface CreateUserDTO {
   cpf: string;
   avatar?: string;
   isDeleted?: boolean;
-  roleId: string;
+  roleId: Role[] | string[];
 }
 
 export { CreateUserDTO };

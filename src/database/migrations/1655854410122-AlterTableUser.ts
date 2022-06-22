@@ -12,6 +12,7 @@ export class AlterTableUser1655854410122 implements MigrationInterface {
       new TableColumn({
         name: 'roles_id',
         type: 'varchar',
+        isNullable: true,
       }),
     );
 

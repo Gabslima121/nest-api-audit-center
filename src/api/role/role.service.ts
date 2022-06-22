@@ -16,4 +16,10 @@ export class RoleService {
 
     return this.roleRepository.save(role);
   }
+
+  public async getAllRoles(): Promise<Role[]> {
+    return this.roleRepository.find({
+      select: ['id', 'name'],
+    });
+  }
 }

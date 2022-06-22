@@ -31,9 +31,9 @@ export class UserRoleService {
       throw new Error('User or Role not found');
     }
 
-    userRole.userId = userId;
-    userRole.roleId = roleId;
+    userRole.userId = user.id;
+    userRole.roleId = role.id;
 
-    return this.userRoleRepository.save(userRole);
+    return await this.userRoleRepository.save(userRole);
   }
 }
