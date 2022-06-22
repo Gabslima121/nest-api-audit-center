@@ -81,29 +81,21 @@ class UserService {
   }
 
   async getAllUsers(): Promise<User[]> {
-    const users = await this.userRepository.query(
-      `SELECT u.id, u.name, u.email, u.cpf, u.avatar, u.is_deleted, r.id as roleId, r.name as roleName
-      FROM users u
-      LEFT JOIN user_roles ur ON u.id = ur.user_id
-      LEFT JOIN roles r ON ur.role_id = r.id`,
-    );
+    const users = await this.userRepository.find({
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      relations: ['roles'],
+    });
 
     return users;
   }
 
   async getUserById(id: string): Promise<User> {
-    // using typeorm, return a const named users to find user by id with relations to roles (id, name) and user_roles (id, user_id, role_id) table (user_roles.user_id = id)
-    const users = await this.userRepository.query(
-      `SELECT u.id, u.name, u.email, u.cpf, u.avatar, u.is_deleted, r.id as roleId, r.name as roleName
-      FROM users u
-      LEFT JOIN user_roles ur ON u.id = ur.user_id
-      LEFT JOIN roles r ON ur.role_id = r.id
-      WHERE u.id = ${id}`,
-    );
+    const user = await this.userRepository.findOne(id, {
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      relations: ['roles'],
+    });
 
-    return users[0];
+    return user;
   }
-
-  // async associateUserWithRole(userId: number, roleId: number): Promise<void> {}
 }
 export { UserService };
