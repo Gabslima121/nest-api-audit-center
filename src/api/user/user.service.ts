@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
 
-import { CreateUserDTO } from './user.dto';
+import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
+import { ApiError } from 'src/shared/errors';
+
 @Injectable()
 class UserService {
   private userRepository: UserRepository;
@@ -33,7 +35,7 @@ class UserService {
     const userRole = new UserRole();
 
     if (!email || !password) {
-      throw new Error('Email and password are required');
+      throw new ApiError('Email and password are required');
     }
 
     await this.checkIfUserExists(email, cpf);
@@ -43,8 +45,6 @@ class UserService {
     const role = await this.roleRepository.findOne({
       where: { id: roleId },
     });
-
-    console.log('service', role);
 
     user.name = name;
     user.avatar = avatar || '';
@@ -58,14 +58,12 @@ class UserService {
     userRole.userId = newUser.id;
     userRole.roleId = role.id;
 
-    console.log('service', newUser);
-
     await this.userRoleRepository.save(userRole);
 
     return newUser;
   }
 
-  async checkIfUserExists(email: string, cpf: string) {
+  async checkIfUserExists(email: string, cpf: string): Promise<object> {
     const user = await this.userRepository.findOne({
       where: {
         email,
@@ -74,10 +72,10 @@ class UserService {
     });
 
     if (user) {
-      throw new Error('User already exists. Please try another email or cpf');
+      throw new ApiError('User already exists');
     }
 
-    return false;
+    return user;
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -94,6 +92,28 @@ class UserService {
       select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
       relations: ['roles'],
     });
+
+    return user;
+  }
+
+  async validadeUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted', 'password'],
+      relations: ['roles'],
+    });
+  }
+
+  async getUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      relations: ['roles'],
+    });
+
+    if (!user) {
+      throw new ApiError('User not found');
+    }
 
     return user;
   }

@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiModule } from './api/api.module';
+import { APP_GUARD } from '@nestjs/core';
 
+import { ApiModule } from './api/api.module';
 import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
+import { JwtAuthGuard } from './api/auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -12,6 +14,11 @@ import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
     ApiModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

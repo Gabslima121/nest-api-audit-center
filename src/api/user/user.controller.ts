@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Inject, Post, Param } from '@nestjs/common';
-import { CreateUserDTO } from './user.dto';
+import { IsPublic } from '../auth/decorators/is-public.decorator';
+
+import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -21,7 +23,18 @@ export class UserController {
         roleId,
       });
     } catch (error) {
-      return error;
+      console.log(error);
+      return { error: error.message };
+    }
+  }
+
+  @Get('by-email')
+  async getUserByEmail(@Body() { email }: FindUserByEmailDTO) {
+    try {
+      return this.userService.getUserByEmail({ email });
+    } catch (error) {
+      console.log(error);
+      return { error: error.message };
     }
   }
 
@@ -35,11 +48,11 @@ export class UserController {
   }
 
   @Get('/:id')
-  async getUserById(@Param() id: string): Promise<User> {
+  async getUserById(@Param() id: string): Promise<User | object> {
     try {
       return this.userService.getUserById(id);
     } catch (error) {
-      return error;
+      return { error: error.message };
     }
   }
 }
