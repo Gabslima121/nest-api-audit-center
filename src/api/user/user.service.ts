@@ -8,6 +8,8 @@ import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
+import { ApiError } from 'src/shared/errors';
+
 @Injectable()
 class UserService {
   private userRepository: UserRepository;
@@ -33,7 +35,7 @@ class UserService {
     const userRole = new UserRole();
 
     if (!email || !password) {
-      throw new Error('Email and password are required');
+      throw new ApiError('Email and password are required');
     }
 
     await this.checkIfUserExists(email, cpf);
@@ -61,7 +63,7 @@ class UserService {
     return newUser;
   }
 
-  async checkIfUserExists(email: string, cpf: string) {
+  async checkIfUserExists(email: string, cpf: string): Promise<object> {
     const user = await this.userRepository.findOne({
       where: {
         email,
@@ -70,10 +72,10 @@ class UserService {
     });
 
     if (user) {
-      throw new Error('User already exists. Please try another email or cpf');
+      throw new ApiError('User already exists');
     }
 
-    return false;
+    return user;
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -103,11 +105,17 @@ class UserService {
   }
 
   async getUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email },
       select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
       relations: ['roles'],
     });
+
+    if (!user) {
+      throw new ApiError('User not found');
+    }
+
+    return user;
   }
 }
 export { UserService };
