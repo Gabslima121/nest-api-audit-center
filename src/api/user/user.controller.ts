@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Inject, Post, Param } from '@nestjs/common';
-import { CreateUserDTO } from './user.dto';
+import { IsPublic } from '../auth/decorators/is-public.decorator';
+
+import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -20,6 +22,15 @@ export class UserController {
         password,
         roleId,
       });
+    } catch (error) {
+      return error;
+    }
+  }
+
+  @Get('by-email')
+  async getUserByEmail(@Body() { email }: FindUserByEmailDTO): Promise<User> {
+    try {
+      return this.userService.getUserByEmail({ email });
     } catch (error) {
       return error;
     }

@@ -10,4 +10,8 @@ interface CreateUserDTO {
   roleId: Role[] | string[];
 }
 
-export { CreateUserDTO };
+interface FindUserByEmailDTO {
+  email: string;
+}
+
+export { CreateUserDTO, FindUserByEmailDTO };

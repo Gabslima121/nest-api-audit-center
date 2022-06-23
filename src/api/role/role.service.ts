@@ -22,4 +22,15 @@ export class RoleService {
       select: ['id', 'name'],
     });
   }
+
+  public mapRoles(roles: Role[]) {
+    const mappedRoles = roles.map((role) => {
+      return {
+        id: role.id,
+        name: role.name,
+      };
+    });
+
+    return mappedRoles;
+  }
 }

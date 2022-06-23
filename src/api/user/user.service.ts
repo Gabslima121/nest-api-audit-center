@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
 
-import { CreateUserDTO } from './user.dto';
+import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
@@ -44,8 +44,6 @@ class UserService {
       where: { id: roleId },
     });
 
-    console.log('service', role);
-
     user.name = name;
     user.avatar = avatar || '';
     user.cpf = cpf;
@@ -57,8 +55,6 @@ class UserService {
 
     userRole.userId = newUser.id;
     userRole.roleId = role.id;
-
-    console.log('service', newUser);
 
     await this.userRoleRepository.save(userRole);
 
@@ -96,6 +92,22 @@ class UserService {
     });
 
     return user;
+  }
+
+  async validadeUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted', 'password'],
+      relations: ['roles'],
+    });
+  }
+
+  async getUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      relations: ['roles'],
+    });
   }
 }
 export { UserService };
