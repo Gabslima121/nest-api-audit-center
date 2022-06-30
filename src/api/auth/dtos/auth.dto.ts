@@ -13,12 +13,14 @@ export interface UserPayload {
   email: string;
   cpf: string;
   roles: Role[];
+  name: string;
   iat?: number;
   exp?: number;
 }
 
 export interface UserToken {
   accessToken: string;
+  user: User;
 }
 
 export interface UserFromJwt {
