@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ApiError } from 'src/shared/errors';
 import { Connection } from 'typeorm';
 import { CreateCompanyDTO } from './company.dto';
 import { Company } from './company.entity';
@@ -27,7 +26,7 @@ class CompanyService {
     const company = new Company();
 
     if (!corporateName || !cnpj) {
-      throw new ApiError('Name and cnpj are required');
+      throw new Error('Corporate name and cnpj are required');
     }
 
     company.cep = cep;

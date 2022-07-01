@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  Inject,
+  Post,
+} from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
@@ -45,8 +52,7 @@ export class CompanyController {
         complement,
       });
     } catch (error) {
-      console.log(error);
-      return error;
+      throw new HttpException(error.message, 400);
     }
   }
 
