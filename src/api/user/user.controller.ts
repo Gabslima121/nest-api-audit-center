@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Inject, Post, Param } from '@nestjs/common';
-import { IsPublic } from '../auth/decorators/is-public.decorator';
 
 import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';

@@ -47,6 +47,7 @@ export class CreateCompanyTable1656636857958 implements MigrationInterface {
           {
             name: 'complement',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'created_at',

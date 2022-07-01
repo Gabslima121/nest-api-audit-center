@@ -117,5 +117,26 @@ class UserService {
 
     return user;
   }
+
+  async checkIfUserIsAdmin(id: string): Promise<boolean> {
+    const user = await this.userRepository.findOne(id, {
+      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      relations: ['roles'],
+    });
+
+    if (!user) {
+      throw new ApiError('User not found');
+    }
+
+    const isAdmin = user.roles.some(
+      (role) => role.name === 'ADMIN' || role.name === 'SUPER_ADMIN',
+    );
+
+    if (!isAdmin) {
+      throw new ApiError('User is not admin');
+    }
+
+    return true;
+  }
 }
 export { UserService };
