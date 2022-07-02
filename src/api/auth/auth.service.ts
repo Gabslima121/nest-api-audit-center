@@ -46,6 +46,6 @@ export class AuthService {
       }
     }
 
-    throw new Error('Invalid credentials');
+    throw new Error('invalid_credentials');
   }
 }

@@ -26,7 +26,7 @@ class CompanyService {
     const company = new Company();
 
     if (!corporateName || !cnpj) {
-      throw new Error('Corporate name and cnpj are required');
+      throw new Error('corporate_name_and_cnpj_are_required');
     }
 
     company.cep = cep;

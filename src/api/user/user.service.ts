@@ -8,7 +8,6 @@ import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
-import { ApiError } from 'src/shared/errors';
 
 @Injectable()
 class UserService {
@@ -35,7 +34,7 @@ class UserService {
     const userRole = new UserRole();
 
     if (!email || !password) {
-      throw new ApiError('Email and password are required');
+      throw new Error('Email and password are required');
     }
 
     await this.checkIfUserExists(email, cpf);
@@ -72,7 +71,7 @@ class UserService {
     });
 
     if (user) {
-      throw new ApiError('User already exists');
+      throw new Error('User already exists');
     }
 
     return user;
@@ -112,7 +111,7 @@ class UserService {
     });
 
     if (!user) {
-      throw new ApiError('User not found');
+      throw new Error('User not found');
     }
 
     return user;
@@ -125,7 +124,7 @@ class UserService {
     });
 
     if (!user) {
-      throw new ApiError('User not found');
+      throw new Error('User not found');
     }
 
     const isAdmin = user.roles.some(
@@ -133,7 +132,7 @@ class UserService {
     );
 
     if (!isAdmin) {
-      throw new ApiError('User is not admin');
+      throw new Error('User is not admin');
     }
 
     return true;

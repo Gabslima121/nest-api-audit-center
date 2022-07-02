@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Inject, Post, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Param,
+  HttpException,
+} from '@nestjs/common';
 
 import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';
@@ -22,8 +30,7 @@ export class UserController {
         roleId,
       });
     } catch (error) {
-      console.log(error);
-      return { error: error.message };
+      throw new HttpException(error.message, 400);
     }
   }
 
@@ -33,7 +40,7 @@ export class UserController {
       return this.userService.getUserByEmail({ email });
     } catch (error) {
       console.log(error);
-      return { error: error.message };
+      throw new HttpException(error.message, 400);
     }
   }
 
@@ -42,7 +49,7 @@ export class UserController {
     try {
       return this.userService.getAllUsers();
     } catch (error) {
-      return error;
+      throw new HttpException(error.message, 400);
     }
   }
 
@@ -51,7 +58,7 @@ export class UserController {
     try {
       return this.userService.getUserById(id);
     } catch (error) {
-      return { error: error.message };
+      throw new HttpException(error.message, 400);
     }
   }
 }
