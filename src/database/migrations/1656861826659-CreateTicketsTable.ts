@@ -56,6 +56,7 @@ export class CreateTicketsTable1656861826659 implements MigrationInterface {
           {
             name: 'description',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'created_at',
