@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -41,12 +42,15 @@ class Company {
   complement?: string;
 
   @CreateDateColumn({ name: 'created_at' })
+  @Exclude({ toPlainOnly: true })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
+  @Exclude({ toPlainOnly: true })
   updatedAt!: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
+  @Exclude({ toPlainOnly: true })
   deletedAt!: Date;
 
   constructor() {

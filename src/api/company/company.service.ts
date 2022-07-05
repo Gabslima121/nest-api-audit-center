@@ -46,7 +46,7 @@ class CompanyService {
     return await this.companyRepository.find();
   }
 
-  public async findCompanyById(id: number): Promise<Company> {
+  public async findCompanyById(id: string): Promise<Company> {
     return await this.companyRepository.findOne({
       where: { id },
     });

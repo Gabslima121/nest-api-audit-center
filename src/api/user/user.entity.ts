@@ -36,12 +36,15 @@ class User {
   @Column({ name: 'is_deleted', default: false })
   isDeleted: boolean;
 
+  @Exclude()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @Exclude()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Exclude()
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: Date;
 

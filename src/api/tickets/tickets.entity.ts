@@ -1,5 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
+
 import { Company } from '../company/company.entity';
 import { User } from '../user/user.entity';
 
@@ -39,7 +41,7 @@ class Tickets {
   sla: string;
 
   @Column({ name: 'company_id' })
-  company_id: string;
+  companyId: string;
 
   @JoinColumn({ name: 'company_id' })
   @ManyToOne(() => Company)
@@ -58,12 +60,15 @@ class Tickets {
   description: string;
 
   @Column({ name: 'created_at', default: 'now()' })
+  @Exclude()
   createdAt: Date;
 
   @Column({ name: 'updated_at', default: 'now()' })
+  @Exclude()
   updatedAt: Date;
 
   @Column({ name: 'deleted_at', nullable: true })
+  @Exclude()
   deletedAt: Date;
 
   constructor() {
