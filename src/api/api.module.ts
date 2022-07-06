@@ -6,6 +6,7 @@ import { UserRoleModule } from './user-role/user-role.module';
 import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './company/company.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { DepartmentsModule } from './departments/departments.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TicketsModule } from './tickets/tickets.module';
     AuthModule,
     CompanyModule,
     TicketsModule,
+    DepartmentsModule,
   ],
 })
 export class ApiModule {}
