@@ -19,10 +19,10 @@ export class TicketsController {
   public async createTicket(
     @Body()
     {
-      analystId,
-      companyId,
-      responsableAreaId,
-      responsableId,
+      analyst,
+      company,
+      responsableArea,
+      responsable,
       closeDate,
       limitDate,
       openDate,
@@ -34,10 +34,10 @@ export class TicketsController {
   ): Promise<Tickets> {
     try {
       return await this.ticketsService.createTicket({
-        analystId,
-        companyId,
-        responsableAreaId,
-        responsableId,
+        analyst,
+        company,
+        responsableArea,
+        responsable,
         closeDate,
         limitDate,
         openDate: openDate || new Date(),

@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateTicketsTable1656861826659 implements MigrationInterface {
+export class CreateTicketsTable1657151417201 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -42,16 +42,16 @@ export class CreateTicketsTable1656861826659 implements MigrationInterface {
           },
           {
             name: 'open_date',
-            type: 'timestamp',
-            default: 'now()',
+            type: 'varchar',
           },
           {
             name: 'limit_date',
-            type: 'timestamp',
+            type: 'varchar',
           },
           {
             name: 'close_date',
-            type: 'timestamp',
+            type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'description',
@@ -85,7 +85,7 @@ export class CreateTicketsTable1656861826659 implements MigrationInterface {
           {
             columnNames: ['responsable_area_id'],
             referencedColumnNames: ['id'],
-            referencedTableName: 'users',
+            referencedTableName: 'departments',
             name: 'FK_ResponsableAreaId_Tickets',
           },
           {

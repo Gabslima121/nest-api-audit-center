@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
+import * as moment from 'moment';
+import 'moment/locale/pt-br';
+
 import { CompanyService } from '../company/company.service';
+import { DepartmentsService } from '../departments/departments.service';
 import { UserService } from '../user/user.service';
 import { CreateTicketsDTO } from './tickets.dto';
 import { Tickets } from './tickets.entity';
@@ -21,11 +25,14 @@ export class TicketsService {
   @Inject(CompanyService)
   private readonly companyService: CompanyService;
 
+  @Inject(DepartmentsService)
+  private readonly departmentsSerivce: DepartmentsService;
+
   public async createTicket({
-    analystId,
-    companyId,
-    responsableAreaId,
-    responsableId,
+    analyst,
+    company,
+    responsableArea,
+    responsable,
     closeDate,
     limitDate,
     openDate,
@@ -36,9 +43,12 @@ export class TicketsService {
   }: CreateTicketsDTO): Promise<Tickets> {
     const ticket = new Tickets();
 
-    const analystExists = await this.userService.getUserById(analystId);
-    const responsableExists = await this.userService.getUserById(responsableId);
-    const companyExists = await this.companyService.findCompanyById(companyId);
+    const analystExists = await this.userService.getUserById(analyst);
+    const responsableExists = await this.userService.getUserById(responsable);
+    const companyExists = await this.companyService.findCompanyById(company);
+    const departmentExists = await this.departmentsSerivce.findDepartmentById(
+      responsableArea,
+    );
 
     if (!analystExists || !responsableExists) {
       throw new Error('analyst_or_responsable_not_found');
@@ -48,22 +58,24 @@ export class TicketsService {
       throw new Error('company_not_found');
     }
 
+    const formatedOpenDate = moment(openDate).format('DD-MM-YYYY');
+    const formatedLimitDate = moment(limitDate).format('DD-MM-YYYY');
+    const formatedCloseDate = !closeDate
+      ? null
+      : moment(closeDate).format('DD-MM-YYYY');
+
     ticket.analystId = analystExists.id;
     ticket.companyId = companyExists.id;
-
-    //TODO change this line
-    ticket.responsableAreaId = responsableAreaId;
-
+    ticket.responsableAreaId = departmentExists.id;
     ticket.responsableId = responsableExists.id;
-    ticket.closeDate = closeDate;
-    ticket.limitDate = limitDate;
-    ticket.openDate = openDate || new Date();
+    ticket.closeDate = formatedCloseDate;
+    ticket.limitDate = formatedLimitDate;
+    ticket.openDate =
+      formatedOpenDate || moment(new Date()).format('DD-MM-YYYY');
     ticket.sla = sla;
     ticket.status = status || 'open';
     ticket.title = title;
     ticket.description = description || null;
-
-    // const responsableAreaExists = await this.departmentService.getDepartmentById()
 
     return await this.ticketsRepository.save(ticket);
   }

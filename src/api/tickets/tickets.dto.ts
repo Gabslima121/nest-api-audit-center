@@ -1,11 +1,11 @@
 interface CreateTicketsDTO {
   title: string;
-  responsableId: string;
-  responsableAreaId: string;
-  analystId: string;
+  responsable: string;
+  responsableArea: string;
+  analyst: string;
   status: string;
   sla: string;
-  companyId: string;
+  company: string;
   openDate: Date;
   limitDate: Date;
   closeDate: Date;

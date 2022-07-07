@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 
 import { Company } from '../company/company.entity';
 import { User } from '../user/user.entity';
+import { Departments } from '../departments/departments.entity';
 
 @Entity('tickets')
 class Tickets {
@@ -24,8 +25,8 @@ class Tickets {
   responsableAreaId: string;
 
   @JoinColumn({ name: 'responsable_area_id' })
-  @ManyToOne(() => User)
-  responsableArea: User;
+  @ManyToOne(() => Departments)
+  responsableArea: Departments;
 
   @Column({ name: 'analyst_id' })
   analystId: string;
@@ -48,13 +49,13 @@ class Tickets {
   company: Company;
 
   @Column({ name: 'open_date', default: 'now()' })
-  openDate: Date;
+  openDate: string;
 
   @Column({ name: 'limit_date' })
-  limitDate: Date;
+  limitDate: string;
 
   @Column({ name: 'close_date' })
-  closeDate: Date;
+  closeDate: string;
 
   @Column({ name: 'description', nullable: true })
   description: string;
