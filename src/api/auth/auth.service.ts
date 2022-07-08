@@ -41,6 +41,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           cpf: user.cpf,
+          name: user.name,
           roles: mappedRoles,
         };
       }
