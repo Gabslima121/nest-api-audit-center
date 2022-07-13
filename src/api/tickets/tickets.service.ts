@@ -77,11 +77,11 @@ export class TicketsService {
     ticket.title = title;
     ticket.description = description || null;
 
-    return await this.ticketsRepository.save(ticket);
+    return this.ticketsRepository.save(ticket);
   }
 
   public async findAllTickets(): Promise<Tickets[]> {
-    return await this.ticketsRepository.find({
+    return this.ticketsRepository.find({
       select: [
         'id',
         'title',
@@ -91,7 +91,7 @@ export class TicketsService {
         'sla',
         'limitDate',
       ],
-      relations: ['analyst', 'responsable', 'company'],
+      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
     });
   }
 }

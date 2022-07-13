@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -19,9 +20,11 @@ class Role {
   name?: string;
 
   @CreateDateColumn({ name: 'created_at' })
+  @Exclude({ toPlainOnly: true })
   createdAt?: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
+  @Exclude({ toPlainOnly: true })
   updatedAt?: Date;
 
   @ManyToMany((type) => User, (user) => user.roles)
