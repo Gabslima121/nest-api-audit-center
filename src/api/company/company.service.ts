@@ -47,9 +47,15 @@ class CompanyService {
   }
 
   public async findCompanyById(id: string): Promise<Company> {
-    return await this.companyRepository.findOne({
+    const company = await this.companyRepository.findOne({
       where: { id },
     });
+
+    if (!company) {
+      throw new Error('company_not_found');
+    }
+
+    return company;
   }
 }
 

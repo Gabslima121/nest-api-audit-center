@@ -8,8 +8,11 @@ import {
   DeleteDateColumn,
   ManyToMany,
   JoinTable,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { Company } from '../company/company.entity';
 import { Role } from '../role/role.entity';
 
 @Entity('users')
@@ -61,6 +64,13 @@ class User {
     },
   })
   roles?: Role[];
+
+  @Column({ name: 'company_id', nullable: true })
+  companyId: string;
+
+  @JoinColumn({ name: 'company_id' })
+  @ManyToOne(() => Company)
+  companies: Company;
 
   constructor() {
     if (!this.id) {

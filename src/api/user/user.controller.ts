@@ -7,6 +7,7 @@ import {
   Param,
   HttpException,
 } from '@nestjs/common';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
 import { User } from './user.entity';
@@ -17,9 +18,16 @@ export class UserController {
   @Inject(UserService)
   private readonly userService: UserService;
 
+  @Get('me')
+  getUserByToken(@CurrentUser() user: User): User {
+    console.log(user);
+    return user;
+  }
+
   @Post('create')
   async createUser(
-    @Body() { cpf, email, name, password, roleId }: CreateUserDTO,
+    @Body()
+    { cpf, email, name, password, roleId, companyId, avatar }: CreateUserDTO,
   ) {
     try {
       return await this.userService.createUser({
@@ -28,6 +36,8 @@ export class UserController {
         name,
         password,
         roleId,
+        avatar,
+        companyId,
       });
     } catch (error) {
       throw new HttpException(error.message, 400);
@@ -37,7 +47,7 @@ export class UserController {
   @Get('by-email')
   async getUserByEmail(@Body() { email }: FindUserByEmailDTO) {
     try {
-      return this.userService.getUserByEmail({ email });
+      return await this.userService.getUserByEmail({ email });
     } catch (error) {
       console.log(error);
       throw new HttpException(error.message, 400);
@@ -47,7 +57,7 @@ export class UserController {
   @Get()
   async listAllUsers(): Promise<User[]> {
     try {
-      return this.userService.getAllUsers();
+      return await this.userService.getAllUsers();
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
@@ -56,7 +66,7 @@ export class UserController {
   @Get('/:id')
   async getUserById(@Param() id: string): Promise<User | object> {
     try {
-      return this.userService.getUserById(id);
+      return await this.userService.getUserById(id);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

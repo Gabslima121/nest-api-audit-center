@@ -8,6 +8,7 @@ interface CreateUserDTO {
   avatar?: string;
   isDeleted?: boolean;
   roleId: Role[] | string[];
+  companyId?: string;
 }
 
 interface FindUserByEmailDTO {

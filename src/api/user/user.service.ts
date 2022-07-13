@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
 
@@ -8,18 +8,26 @@ import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
+import { CompanyRepository } from '../company/company.repository';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 class UserService {
   private userRepository: UserRepository;
   private roleRepository: RoleRepository;
   private userRoleRepository: UserRoleRepository;
+  private companyRepository: CompanyRepository;
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
     this.roleRepository = this.connection.getCustomRepository(RoleRepository);
     this.userRoleRepository =
       this.connection.getCustomRepository(UserRoleRepository);
+    this.companyRepository =
+      this.connection.getCustomRepository(CompanyRepository);
   }
+
+  @Inject(CompanyService)
+  private readonly companyService: CompanyService;
 
   public async createUser({
     name,
@@ -29,6 +37,7 @@ class UserService {
     isDeleted,
     password,
     roleId,
+    companyId,
   }: CreateUserDTO): Promise<User> {
     const user = new User();
     const userRole = new UserRole();
@@ -38,6 +47,8 @@ class UserService {
     }
 
     await this.checkIfUserExists(email, cpf);
+
+    const company = await this.companyService.findCompanyById(companyId);
 
     const hashedPassword = await hash(password, 12);
 
@@ -51,6 +62,7 @@ class UserService {
     user.email = email;
     user.isDeleted = isDeleted || false;
     user.password = hashedPassword;
+    user.companyId = company.id;
 
     const newUser = await this.userRepository.save(user);
 
@@ -80,7 +92,7 @@ class UserService {
   async getAllUsers(): Promise<User[]> {
     const users = await this.userRepository.find({
       select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
-      relations: ['roles'],
+      relations: ['roles', 'companies'],
     });
 
     return users;
@@ -89,7 +101,7 @@ class UserService {
   async getUserById(id: string): Promise<User> {
     const user = await this.userRepository.findOne(id, {
       select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
-      relations: ['roles'],
+      relations: ['roles', 'companies'],
     });
 
     return user;
@@ -104,11 +116,13 @@ class UserService {
   }
 
   async getUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
-      relations: ['roles'],
-    });
+    const user = await this.userRepository.findOne(
+      { email },
+      {
+        select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+        relations: ['roles', 'companies'],
+      },
+    );
 
     if (!user) {
       throw new Error('User not found');

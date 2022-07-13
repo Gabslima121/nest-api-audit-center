@@ -26,6 +26,7 @@ export class RoleService {
   public mapRoles(roles: Role[]) {
     const mappedRoles = roles.map((role) => {
       return {
+        id: role.id,
         name: role.name,
       };
     });
