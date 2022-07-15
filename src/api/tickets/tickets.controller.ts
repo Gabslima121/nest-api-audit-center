@@ -5,8 +5,11 @@ import {
   HttpException,
   Inject,
   Post,
+  Query,
 } from '@nestjs/common';
-import { CreateTicketsDTO } from './tickets.dto';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../user/user.entity';
+import { CreateTicketsDTO, TicketQuery } from './tickets.dto';
 import { Tickets } from './tickets.entity';
 import { TicketsService } from './tickets.service';
 
@@ -54,5 +57,16 @@ export class TicketsController {
   @Get()
   public async findAllTickets(): Promise<Tickets[]> {
     return this.ticketsService.findAllTickets();
+  }
+
+  @Get('get-by-responsable')
+  public async findTicketsByResponsable(
+    @CurrentUser() user: User,
+    @Query() { ticketStatus }: TicketQuery,
+  ): Promise<Tickets[]> {
+    return this.ticketsService.findTicketsByResponsableId(
+      user?.id,
+      ticketStatus,
+    );
   }
 }

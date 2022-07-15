@@ -12,4 +12,8 @@ interface CreateTicketsDTO {
   description?: string;
 }
 
-export { CreateTicketsDTO };
+interface TicketQuery {
+  ticketStatus: string;
+}
+
+export { CreateTicketsDTO, TicketQuery };

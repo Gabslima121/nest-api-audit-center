@@ -73,7 +73,7 @@ export class TicketsService {
     ticket.openDate =
       formatedOpenDate || moment(new Date()).format('DD-MM-YYYY');
     ticket.sla = sla;
-    ticket.status = status || 'open';
+    ticket.status = status || 'OPEN';
     ticket.title = title;
     ticket.description = description || null;
 
@@ -93,5 +93,39 @@ export class TicketsService {
       ],
       relations: ['analyst', 'responsable', 'company', 'responsableArea'],
     });
+  }
+
+  public async findTicketsByResponsableId(
+    responsableId: string,
+    status?: string,
+  ): Promise<Tickets[] | any> {
+    let where = {};
+
+    if (status) {
+      where = { responsableId, status };
+    } else {
+      where = { responsableId };
+    }
+
+    const tickets = await this.ticketsRepository.find({
+      where,
+      select: [
+        'id',
+        'title',
+        'status',
+        'openDate',
+        'closeDate',
+        'sla',
+        'limitDate',
+      ],
+      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
+    });
+
+    const total = tickets.length;
+
+    return {
+      data: { tickets },
+      total,
+    };
   }
 }

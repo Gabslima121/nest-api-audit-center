@@ -72,6 +72,8 @@ class Tickets {
   @Exclude()
   deletedAt: Date;
 
+  total?: number;
+
   constructor() {
     if (!this.id) {
       this.id = uuid();
