@@ -49,4 +49,24 @@ export class AuthService {
 
     throw new Error('invalid_credentials');
   }
+
+  async validateToken(token: string): Promise<UserPayload> {
+    const decoded = await this.jwtService.verify(token);
+
+    if (!decoded) throw new Error('invalid_token');
+
+    const userExists = await this.userService.getUserById(decoded?.sub);
+
+    if (!userExists) throw new Error('invalid_token');
+
+    const payload: UserPayload = {
+      id: userExists.id,
+      email: userExists.email,
+      cpf: userExists.cpf,
+      roles: userExists.roles,
+      name: userExists.name,
+    };
+
+    return payload;
+  }
 }

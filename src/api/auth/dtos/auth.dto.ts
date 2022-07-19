@@ -9,7 +9,8 @@ export interface AuthRequest extends Request {
 }
 
 export interface UserPayload {
-  sub: string;
+  id?: string;
+  sub?: string;
   email: string;
   cpf: string;
   roles: Role[];
@@ -34,4 +35,8 @@ export class LoginRequestBody {
 
   @IsString()
   password: string;
+}
+
+export interface ValidateToken {
+  token: string;
 }
