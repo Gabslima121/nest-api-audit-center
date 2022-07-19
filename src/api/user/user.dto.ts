@@ -15,4 +15,10 @@ interface FindUserByEmailDTO {
   email: string;
 }
 
-export { CreateUserDTO, FindUserByEmailDTO };
+interface UpdateUserDTO {
+  name: string;
+  email: string;
+  userId: string;
+}
+
+export { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO };

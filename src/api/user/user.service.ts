@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
 
-import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
+import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
@@ -150,6 +150,31 @@ class UserService {
     }
 
     return true;
+  }
+
+  async updateUser({
+    email,
+    name,
+    userId,
+  }: UpdateUserDTO): Promise<object | void> {
+    const user = await this.getUserById(userId);
+
+    const updatedUser = await this.userRepository.update(user.id, {
+      name,
+      email,
+    });
+
+    if (updatedUser) {
+      return {
+        status: 'success',
+        message: 'user_updated',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'user_not_updated',
+    };
   }
 }
 export { UserService };

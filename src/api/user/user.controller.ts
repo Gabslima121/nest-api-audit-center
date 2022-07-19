@@ -6,10 +6,11 @@ import {
   Post,
   Param,
   HttpException,
+  Put,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
-import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
+import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -67,6 +68,18 @@ export class UserController {
   async getUserById(@Param() id: string): Promise<User | object> {
     try {
       return await this.userService.getUserById(id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Put('update/:userId')
+  async updateUser(
+    @Body() { email, name }: UpdateUserDTO,
+    @Param() { userId }: UpdateUserDTO,
+  ): Promise<object | void> {
+    try {
+      return await this.userService.updateUser({ userId, email, name });
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
