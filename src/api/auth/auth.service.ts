@@ -22,6 +22,7 @@ export class AuthService {
       cpf: user.cpf,
       roles: user.roles,
       name: user.name,
+      companyId: user.companyId,
     };
 
     const jwtToken = this.jwtService.sign(payload);
@@ -43,6 +44,7 @@ export class AuthService {
           cpf: user.cpf,
           name: user.name,
           roles: mappedRoles,
+          companyId: user.companyId,
         };
       }
     }
@@ -65,6 +67,7 @@ export class AuthService {
       cpf: userExists.cpf,
       roles: userExists.roles,
       name: userExists.name,
+      companyId: userExists.companyId,
     };
 
     return payload;

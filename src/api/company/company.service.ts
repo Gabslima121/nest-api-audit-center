@@ -47,6 +47,16 @@ class CompanyService {
   }
 
   public async findCompanyById(id: string): Promise<Company> {
+    const company = await this.companyRepository.findOne({ where: { id } });
+
+    if (!company) {
+      throw new Error('company_not_found');
+    }
+
+    return company;
+  }
+
+  public async deleteCompany(id: string): Promise<void> {
     const company = await this.companyRepository.findOne({
       where: { id },
     });
@@ -55,7 +65,7 @@ class CompanyService {
       throw new Error('company_not_found');
     }
 
-    return company;
+    await this.companyRepository.remove(company);
   }
 }
 

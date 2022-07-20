@@ -91,7 +91,15 @@ class UserService {
 
   async getAllUsers(): Promise<User[]> {
     const users = await this.userRepository.find({
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
       relations: ['roles', 'companies'],
     });
 
@@ -100,7 +108,15 @@ class UserService {
 
   async getUserById(id: string): Promise<User> {
     const user = await this.userRepository.findOne(id, {
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
       relations: ['roles', 'companies'],
     });
 
@@ -110,8 +126,17 @@ class UserService {
   async validadeUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
     return await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted', 'password'],
-      relations: ['roles'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+        'password',
+      ],
+      relations: ['roles', 'companies'],
     });
   }
 
@@ -119,7 +144,15 @@ class UserService {
     const user = await this.userRepository.findOne(
       { email },
       {
-        select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+        select: [
+          'companyId',
+          'id',
+          'name',
+          'email',
+          'cpf',
+          'avatar',
+          'isDeleted',
+        ],
         relations: ['roles', 'companies'],
       },
     );
@@ -133,7 +166,15 @@ class UserService {
 
   async checkIfUserIsAdmin(id: string): Promise<boolean> {
     const user = await this.userRepository.findOne(id, {
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
       relations: ['roles'],
     });
 

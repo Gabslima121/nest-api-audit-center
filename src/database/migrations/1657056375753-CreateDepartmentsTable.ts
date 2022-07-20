@@ -48,6 +48,7 @@ export class CreateDepartmentsTable1657056375753 implements MigrationInterface {
             referencedColumnNames: ['id'],
             referencedTableName: 'company',
             name: 'FK_CompnayId_Departments',
+            onDelete: 'CASCADE',
           },
         ],
       }),

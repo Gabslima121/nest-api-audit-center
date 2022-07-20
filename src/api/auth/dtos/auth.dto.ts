@@ -17,6 +17,7 @@ export interface UserPayload {
   name: string;
   iat?: number;
   exp?: number;
+  companyId: string;
 }
 
 export interface UserToken {

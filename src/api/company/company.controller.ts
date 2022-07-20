@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Inject,
+  Param,
   Post,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -65,6 +67,29 @@ export class CompanyController {
     } catch (error) {
       console.log(error);
       return error;
+    }
+  }
+
+  @Delete('delete/:id')
+  async deleteCompany(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+  ): Promise<void> {
+    try {
+      await this.userService.checkIfUserIsAdmin(user.id);
+
+      return this.companyService.deleteCompany(id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('/:id')
+  async getCompanyById(@Param('id') id: string) {
+    try {
+      return await this.companyService.findCompanyById(id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
     }
   }
 }
