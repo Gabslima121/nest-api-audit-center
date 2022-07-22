@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Inject,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
@@ -68,5 +70,20 @@ export class TicketsController {
       user?.id,
       ticketStatus,
     );
+  }
+
+  @Get('get-by-company/:companyId')
+  public async findTicketsByCompany(
+    @Param('companyId') companyId: string,
+  ): Promise<Tickets[]> {
+    return this.ticketsService.findTicketsByCompanyId(companyId);
+  }
+
+  @Delete('delete/:id/:companyId')
+  public async deleteTicket(
+    @Param('id') id: string,
+    @Param('companyId') companyId: string,
+  ): Promise<void> {
+    return this.ticketsService.deleteTicketByCompany(companyId, id);
   }
 }

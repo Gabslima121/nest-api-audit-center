@@ -52,8 +52,12 @@ export class AuthService {
     throw new Error('invalid_credentials');
   }
 
-  async validateToken(token: string): Promise<UserPayload> {
-    const decoded = await this.jwtService.verify(token);
+  async validateToken(token?: string): Promise<object> {
+    // if (!token) throw new Error('invalid_token');
+
+    const decoded = await this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET,
+    });
 
     if (!decoded) throw new Error('invalid_token');
 
@@ -70,6 +74,9 @@ export class AuthService {
       companyId: userExists.companyId,
     };
 
-    return payload;
+    return {
+      payload: { ...payload },
+      accessToken: token,
+    };
   }
 }

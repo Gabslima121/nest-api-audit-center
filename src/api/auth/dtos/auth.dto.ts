@@ -39,5 +39,5 @@ export class LoginRequestBody {
 }
 
 export interface ValidateToken {
-  token: string;
+  token?: string;
 }

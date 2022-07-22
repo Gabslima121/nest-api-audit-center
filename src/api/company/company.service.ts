@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
-import { CreateCompanyDTO } from './company.dto';
+import { CreateCompanyDTO, UpdateCompanyDTO } from './company.dto';
 import { Company } from './company.entity';
 import { CompanyRepository } from './company.repository';
 
@@ -66,6 +66,39 @@ class CompanyService {
     }
 
     await this.companyRepository.remove(company);
+  }
+
+  public async updateCompany(
+    id: string,
+    {
+      cep,
+      city,
+      cnpj,
+      corporateName,
+      neighborhood,
+      number,
+      state,
+      street,
+      complement,
+    }: UpdateCompanyDTO,
+  ): Promise<void> {
+    if (!corporateName || !cnpj) {
+      throw new Error('corporate_name_and_cnpj_are_required');
+    }
+
+    const company = await this.findCompanyById(id);
+
+    this.companyRepository.update(company?.id, {
+      cep,
+      city,
+      cnpj,
+      corporateName,
+      neighborhood,
+      number,
+      state,
+      street,
+      complement,
+    });
   }
 }
 

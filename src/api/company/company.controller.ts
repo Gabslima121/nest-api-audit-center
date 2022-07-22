@@ -7,6 +7,7 @@ import {
   Inject,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/user.entity';
@@ -88,6 +89,39 @@ export class CompanyController {
   async getCompanyById(@Param('id') id: string) {
     try {
       return await this.companyService.findCompanyById(id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Put('update/:id')
+  async updateCompany(
+    @Param('id') id: string,
+    @Body()
+    {
+      cep,
+      city,
+      cnpj,
+      corporateName,
+      neighborhood,
+      number,
+      state,
+      street,
+      complement,
+    }: CreateCompanyDTO,
+  ): Promise<void> {
+    try {
+      await this.companyService.updateCompany(id, {
+        cep,
+        city,
+        cnpj,
+        corporateName,
+        neighborhood,
+        number,
+        state,
+        street,
+        complement,
+      });
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

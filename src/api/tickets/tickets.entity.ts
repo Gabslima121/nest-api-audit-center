@@ -1,4 +1,13 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { v4 as uuid } from 'uuid';
 
@@ -60,15 +69,15 @@ class Tickets {
   @Column({ name: 'description', nullable: true })
   description: string;
 
-  @Column({ name: 'created_at', default: 'now()' })
+  @CreateDateColumn({ name: 'created_at', default: 'now()' })
   @Exclude()
   createdAt: Date;
 
-  @Column({ name: 'updated_at', default: 'now()' })
+  @UpdateDateColumn({ name: 'updated_at', default: 'now()' })
   @Exclude()
   updatedAt: Date;
 
-  @Column({ name: 'deleted_at', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   @Exclude()
   deletedAt: Date;
 

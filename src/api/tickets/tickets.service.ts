@@ -128,4 +128,29 @@ export class TicketsService {
       total,
     };
   }
+
+  public async findTicketById(id: string): Promise<Tickets> {
+    return this.ticketsRepository.findOne({
+      where: { id },
+      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
+    });
+  }
+
+  public async findTicketsByCompanyId(companyId: string): Promise<Tickets[]> {
+    return this.ticketsRepository.find({
+      where: { companyId },
+      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
+    });
+  }
+
+  public async deleteTicketByCompany(
+    companyId: string,
+    ticketId: string,
+  ): Promise<void> {
+    const ticket = await this.ticketsRepository.findOne({
+      where: { id: ticketId, companyId },
+    });
+
+    await this.ticketsRepository.softDelete(ticket?.id);
+  }
 }
