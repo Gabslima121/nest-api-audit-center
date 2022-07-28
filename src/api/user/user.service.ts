@@ -217,5 +217,27 @@ class UserService {
       message: 'user_not_updated',
     };
   }
+
+  async getUserByCompanyId(companyId: string): Promise<User[]> {
+    const user = await this.userRepository.find({
+      where: { companyId },
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
+      relations: ['roles', 'companies'],
+    });
+
+    if (!user) {
+      throw new Error('no_users_found');
+    }
+
+    return user;
+  }
 }
 export { UserService };

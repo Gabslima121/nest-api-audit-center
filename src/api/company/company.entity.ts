@@ -4,10 +4,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { Sla } from '../sla/sla.entity';
 
 @Entity('company')
 class Company {
@@ -52,6 +54,9 @@ class Company {
   @DeleteDateColumn({ name: 'deleted_at' })
   @Exclude({ toPlainOnly: true })
   deletedAt!: Date;
+
+  // @ManyToOne(() => Sla, (sla) => sla.company)
+  // slaId: Sla;
 
   constructor() {
     if (!this.id) {

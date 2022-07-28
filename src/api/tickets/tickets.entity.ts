@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid';
 import { Company } from '../company/company.entity';
 import { User } from '../user/user.entity';
 import { Departments } from '../departments/departments.entity';
+import { Sla } from '../sla/sla.entity';
 
 @Entity('tickets')
 class Tickets {
@@ -47,9 +48,6 @@ class Tickets {
   @Column({ name: 'status', default: 'open' })
   status: string;
 
-  @Column({ name: 'sla' })
-  sla: string;
-
   @Column({ name: 'company_id' })
   companyId: string;
 
@@ -68,6 +66,13 @@ class Tickets {
 
   @Column({ name: 'description', nullable: true })
   description: string;
+
+  @Column({ name: 'sla_id' })
+  slaId: string;
+
+  @JoinColumn({ name: 'sla_id' })
+  @ManyToOne(() => Sla)
+  sla: Sla;
 
   @CreateDateColumn({ name: 'created_at', default: 'now()' })
   @Exclude()

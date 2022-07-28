@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './company/company.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { SlaModule } from './sla/sla.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DepartmentsModule } from './departments/departments.module';
     CompanyModule,
     TicketsModule,
     DepartmentsModule,
+    SlaModule,
   ],
 })
 export class ApiModule {}

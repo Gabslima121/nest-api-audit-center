@@ -7,11 +7,12 @@ import {
   Inject,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/user.entity';
-import { CreateTicketsDTO, TicketQuery } from './tickets.dto';
+import { CreateTicketsDTO, TicketQuery, UpdateTicket } from './tickets.dto';
 import { Tickets } from './tickets.entity';
 import { TicketsService } from './tickets.service';
 
@@ -85,5 +86,47 @@ export class TicketsController {
     @Param('companyId') companyId: string,
   ): Promise<void> {
     return this.ticketsService.deleteTicketByCompany(companyId, id);
+  }
+
+  @Get('/:id')
+  public async findTicketById(@Param('id') id: string): Promise<Tickets> {
+    return this.ticketsService.findTicketById(id);
+  }
+
+  @Put('update-ticket/:id')
+  public async updateTicket(
+    @Param('id') id: string,
+    @Body()
+    {
+      analyst,
+      company,
+      responsableArea,
+      responsable,
+      closeDate,
+      limitDate,
+      openDate,
+      sla,
+      status,
+      title,
+      description,
+    }: UpdateTicket,
+  ): Promise<object> {
+    try {
+      return await this.ticketsService.updateTicket(id, {
+        analyst,
+        company,
+        responsableArea,
+        responsable,
+        closeDate,
+        limitDate,
+        openDate: openDate || new Date(),
+        sla,
+        status,
+        title,
+        description: description || null,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
   }
 }

@@ -6,9 +6,10 @@ import 'moment/locale/pt-br';
 import { CompanyService } from '../company/company.service';
 import { DepartmentsService } from '../departments/departments.service';
 import { UserService } from '../user/user.service';
-import { CreateTicketsDTO } from './tickets.dto';
+import { CreateTicketsDTO, UpdateTicket } from './tickets.dto';
 import { Tickets } from './tickets.entity';
 import { TicketsRepository } from './tickets.repository';
+import { SlaService } from '../sla/sla.service';
 
 @Injectable()
 export class TicketsService {
@@ -27,6 +28,9 @@ export class TicketsService {
 
   @Inject(DepartmentsService)
   private readonly departmentsSerivce: DepartmentsService;
+
+  @Inject(SlaService)
+  private readonly slaSerivce: SlaService;
 
   public async createTicket({
     analyst,
@@ -49,6 +53,7 @@ export class TicketsService {
     const departmentExists = await this.departmentsSerivce.findDepartmentById(
       responsableArea,
     );
+    const slaExists = await this.slaSerivce.findSlaById(sla);
 
     if (!analystExists || !responsableExists) {
       throw new Error('analyst_or_responsable_not_found');
@@ -64,15 +69,15 @@ export class TicketsService {
       ? null
       : moment(closeDate).format('DD-MM-YYYY');
 
-    ticket.analystId = analystExists.id;
-    ticket.companyId = companyExists.id;
-    ticket.responsableAreaId = departmentExists.id;
-    ticket.responsableId = responsableExists.id;
+    ticket.analystId = analystExists?.id;
+    ticket.companyId = companyExists?.id;
+    ticket.responsableAreaId = departmentExists?.id;
+    ticket.responsableId = responsableExists?.id;
     ticket.closeDate = formatedCloseDate;
     ticket.limitDate = formatedLimitDate;
     ticket.openDate =
       formatedOpenDate || moment(new Date()).format('DD-MM-YYYY');
-    ticket.sla = sla;
+    ticket.slaId = slaExists?.id;
     ticket.status = status || 'OPEN';
     ticket.title = title;
     ticket.description = description || null;
@@ -82,16 +87,14 @@ export class TicketsService {
 
   public async findAllTickets(): Promise<Tickets[]> {
     return this.ticketsRepository.find({
-      select: [
-        'id',
-        'title',
-        'status',
-        'openDate',
-        'closeDate',
+      select: ['id', 'title', 'status', 'openDate', 'closeDate', 'limitDate'],
+      relations: [
+        'analyst',
+        'responsable',
+        'company',
+        'responsableArea',
         'sla',
-        'limitDate',
       ],
-      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
     });
   }
 
@@ -109,16 +112,14 @@ export class TicketsService {
 
     const tickets = await this.ticketsRepository.find({
       where,
-      select: [
-        'id',
-        'title',
-        'status',
-        'openDate',
-        'closeDate',
+      select: ['id', 'title', 'status', 'openDate', 'closeDate', 'limitDate'],
+      relations: [
+        'analyst',
+        'responsable',
+        'company',
+        'responsableArea',
         'sla',
-        'limitDate',
       ],
-      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
     });
 
     const total = tickets.length;
@@ -132,14 +133,27 @@ export class TicketsService {
   public async findTicketById(id: string): Promise<Tickets> {
     return this.ticketsRepository.findOne({
       where: { id },
-      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
+      select: ['id', 'title', 'status', 'openDate', 'closeDate', 'limitDate'],
+      relations: [
+        'analyst',
+        'responsable',
+        'company',
+        'responsableArea',
+        'sla',
+      ],
     });
   }
 
   public async findTicketsByCompanyId(companyId: string): Promise<Tickets[]> {
     return this.ticketsRepository.find({
       where: { companyId },
-      relations: ['analyst', 'responsable', 'company', 'responsableArea'],
+      relations: [
+        'analyst',
+        'responsable',
+        'company',
+        'responsableArea',
+        'sla',
+      ],
     });
   }
 
@@ -152,5 +166,72 @@ export class TicketsService {
     });
 
     await this.ticketsRepository.softDelete(ticket?.id);
+  }
+
+  public async updateTicket(
+    id: string,
+    {
+      analyst,
+      company,
+      responsableArea,
+      responsable,
+      closeDate,
+      limitDate,
+      openDate,
+      sla,
+      status,
+      title,
+      description,
+    }: UpdateTicket,
+  ): Promise<object> {
+    const ticket = await this.findTicketById(id);
+
+    const analystExists = await this.userService.getUserById(analyst);
+    const responsableExists = await this.userService.getUserById(responsable);
+    const companyExists = await this.companyService.findCompanyById(company);
+    const departmentExists = await this.departmentsSerivce.findDepartmentById(
+      responsableArea,
+    );
+    const slaExists = await this.slaSerivce.findSlaById(sla);
+
+    if (!analystExists || !responsableExists) {
+      throw new Error('analyst_or_responsable_not_found');
+    }
+
+    if (!companyExists) {
+      throw new Error('company_not_found');
+    }
+
+    const formatedOpenDate = moment(openDate).format('DD-MM-YYYY');
+    const formatedLimitDate = moment(limitDate).format('DD-MM-YYYY');
+    const formatedCloseDate = !closeDate
+      ? null
+      : moment(closeDate).format('DD-MM-YYYY');
+
+    const updatedTicket = await this.ticketsRepository.update(ticket?.id, {
+      analystId: analystExists?.id,
+      companyId: companyExists?.id,
+      responsableAreaId: departmentExists?.id,
+      responsableId: responsableExists?.id,
+      closeDate: formatedCloseDate,
+      limitDate: formatedLimitDate,
+      openDate: formatedOpenDate || moment(new Date()).format('DD-MM-YYYY'),
+      slaId: slaExists?.id,
+      status: status || 'OPEN',
+      title: title,
+      description: description || null,
+    });
+
+    if (updatedTicket) {
+      return {
+        status: 'success',
+        message: 'ticket_updated',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'ticket_not_updated',
+    };
   }
 }

@@ -49,4 +49,11 @@ export class DepartmentsController {
 
     return this.departmentsService.findAllDepartments();
   }
+
+  @Get('/:companyId')
+  async findAllDepartmentsByCompanyId(
+    @Param('companyId') companyId: string,
+  ): Promise<Departments[]> {
+    return this.departmentsService.findDepartmentByCompanyId(companyId);
+  }
 }

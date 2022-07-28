@@ -46,4 +46,12 @@ export class DepartmentsService {
       relations: ['company'],
     });
   }
+
+  async findDepartmentByCompanyId(companyId: string): Promise<Departments[]> {
+    return this.departmentsRepository.find({
+      where: { companyId },
+      select: ['id', 'name', 'description', 'companyId'],
+      relations: ['company'],
+    });
+  }
 }

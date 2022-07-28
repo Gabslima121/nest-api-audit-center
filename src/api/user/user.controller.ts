@@ -84,4 +84,13 @@ export class UserController {
       throw new HttpException(error.message, 400);
     }
   }
+
+  @Get('get-user-by-company/:companyId')
+  async getUserByCompanyId(@Param('companyId') companyId: string) {
+    try {
+      return await this.userService.getUserByCompanyId(companyId);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
 }

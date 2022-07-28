@@ -16,4 +16,18 @@ interface TicketQuery {
   ticketStatus: string;
 }
 
-export { CreateTicketsDTO, TicketQuery };
+interface UpdateTicket {
+  title: string;
+  responsable: string;
+  responsableArea: string;
+  analyst: string;
+  status: string;
+  sla: string;
+  company: string;
+  openDate: Date;
+  limitDate: Date;
+  closeDate: Date;
+  description?: string;
+}
+
+export { CreateTicketsDTO, TicketQuery, UpdateTicket };
