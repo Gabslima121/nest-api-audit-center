@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateTicketItemsTable1659046906018 implements MigrationInterface {
+export class CreateTicketItemsTable1659050694297 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -27,6 +27,7 @@ export class CreateTicketItemsTable1659046906018 implements MigrationInterface {
           {
             name: 'description',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -37,20 +38,19 @@ export class CreateTicketItemsTable1659046906018 implements MigrationInterface {
             name: 'updated_at',
             type: 'timestamp',
             default: 'now()',
-            isNullable: true,
           },
           {
             name: 'deleted_at',
             type: 'timestamp',
-            isNullable: true,
+            default: 'now()',
           },
         ],
         foreignKeys: [
           {
-            name: 'FK_TICKET_ITEMS_TICKET_ID',
             columnNames: ['ticket_id'],
-            referencedTableName: 'tickets',
             referencedColumnNames: ['id'],
+            referencedTableName: 'tickets',
+            name: 'FK_TicketId_TicketItems',
             onDelete: 'CASCADE',
           },
         ],
