@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   Inject,
   Param,
@@ -27,6 +28,15 @@ export class TicketItemController {
         ticketId,
         description,
       });
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('/:ticketId')
+  async findTicketItemsByTicketId(@Param('ticketId') ticketId: string) {
+    try {
+      return await this.ticketItemService.findTicketItemsByTicketId(ticketId);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

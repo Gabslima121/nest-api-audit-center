@@ -37,4 +37,17 @@ export class TicketItemService {
 
     return this.ticketItemRepository.save(ticketItem);
   }
+
+  public async findTicketItemsByTicketId(
+    ticketId: string,
+  ): Promise<TicketItems[]> {
+    const ticketItems = await this.ticketItemRepository.find({
+      where: { ticketId },
+      relations: ['ticket'],
+    });
+
+    if (!ticketItems) throw new Error('ticket_not_found');
+
+    return ticketItems;
+  }
 }
