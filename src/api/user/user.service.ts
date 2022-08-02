@@ -1,26 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
 
-import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
+import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
-import { ApiError } from 'src/shared/errors';
+import { CompanyRepository } from '../company/company.repository';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 class UserService {
   private userRepository: UserRepository;
   private roleRepository: RoleRepository;
   private userRoleRepository: UserRoleRepository;
+  private companyRepository: CompanyRepository;
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
     this.roleRepository = this.connection.getCustomRepository(RoleRepository);
     this.userRoleRepository =
       this.connection.getCustomRepository(UserRoleRepository);
+    this.companyRepository =
+      this.connection.getCustomRepository(CompanyRepository);
   }
+
+  @Inject(CompanyService)
+  private readonly companyService: CompanyService;
 
   public async createUser({
     name,
@@ -30,15 +37,18 @@ class UserService {
     isDeleted,
     password,
     roleId,
+    companyId,
   }: CreateUserDTO): Promise<User> {
     const user = new User();
     const userRole = new UserRole();
 
     if (!email || !password) {
-      throw new ApiError('Email and password are required');
+      throw new Error('Email and password are required');
     }
 
     await this.checkIfUserExists(email, cpf);
+
+    const company = await this.companyService.findCompanyById(companyId);
 
     const hashedPassword = await hash(password, 12);
 
@@ -52,6 +62,7 @@ class UserService {
     user.email = email;
     user.isDeleted = isDeleted || false;
     user.password = hashedPassword;
+    user.companyId = company.id;
 
     const newUser = await this.userRepository.save(user);
 
@@ -72,7 +83,7 @@ class UserService {
     });
 
     if (user) {
-      throw new ApiError('User already exists');
+      throw new Error('User already exists');
     }
 
     return user;
@@ -80,8 +91,16 @@ class UserService {
 
   async getAllUsers(): Promise<User[]> {
     const users = await this.userRepository.find({
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
-      relations: ['roles'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
+      relations: ['roles', 'companies'],
     });
 
     return users;
@@ -89,8 +108,16 @@ class UserService {
 
   async getUserById(id: string): Promise<User> {
     const user = await this.userRepository.findOne(id, {
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
-      relations: ['roles'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
+      relations: ['roles', 'companies'],
     });
 
     return user;
@@ -99,23 +126,136 @@ class UserService {
   async validadeUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
     return await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted', 'password'],
-      relations: ['roles'],
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+        'password',
+      ],
+      relations: ['roles', 'companies'],
     });
   }
 
   async getUserByEmail({ email }: FindUserByEmailDTO): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { email },
-      select: ['id', 'name', 'email', 'cpf', 'avatar', 'isDeleted'],
+    const user = await this.userRepository.findOne(
+      { email },
+      {
+        select: [
+          'companyId',
+          'id',
+          'name',
+          'email',
+          'cpf',
+          'avatar',
+          'isDeleted',
+        ],
+        relations: ['roles', 'companies'],
+      },
+    );
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
+  }
+
+  async checkIfUserIsAdmin(id: string): Promise<boolean> {
+    const user = await this.userRepository.findOne(id, {
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
       relations: ['roles'],
     });
 
     if (!user) {
-      throw new ApiError('User not found');
+      throw new Error('User not found');
+    }
+
+    const isAdmin = user.roles.some(
+      (role) => role.name === 'ADMIN' || role.name === 'SUPER_ADMIN',
+    );
+
+    if (!isAdmin) {
+      throw new Error('User is not admin');
+    }
+
+    return true;
+  }
+
+  async updateUser({
+    email,
+    name,
+    userId,
+  }: UpdateUserDTO): Promise<object | void> {
+    const user = await this.getUserById(userId);
+
+    const updatedUser = await this.userRepository.update(user.id, {
+      name,
+      email,
+    });
+
+    if (updatedUser) {
+      return {
+        status: 'success',
+        message: 'user_updated',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'user_not_updated',
+    };
+  }
+
+  async getUserByCompanyId(companyId: string): Promise<User[]> {
+    const user = await this.userRepository.find({
+      where: { companyId },
+      select: [
+        'companyId',
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'avatar',
+        'isDeleted',
+      ],
+      relations: ['roles', 'companies'],
+    });
+
+    if (!user) {
+      throw new Error('no_users_found');
     }
 
     return user;
+  }
+
+  async deleteUserById(id: string): Promise<object | void> {
+    const user = await this.getUserById(id);
+
+    const deletedUser = await this.userRepository.softDelete(user?.id);
+
+    if (deletedUser) {
+      return {
+        status: 'success',
+        message: 'user_deleted',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'user_not_deleted',
+    };
   }
 }
 export { UserService };

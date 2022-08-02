@@ -21,11 +21,13 @@ export class AuthService {
       email: user.email,
       cpf: user.cpf,
       roles: user.roles,
+      name: user.name,
+      companyId: user.companyId,
     };
 
     const jwtToken = this.jwtService.sign(payload);
 
-    return { accessToken: jwtToken };
+    return { accessToken: jwtToken, user };
   }
 
   async validateUser(email: string, password: string) {
@@ -40,11 +42,41 @@ export class AuthService {
           id: user.id,
           email: user.email,
           cpf: user.cpf,
+          name: user.name,
           roles: mappedRoles,
+          companyId: user.companyId,
         };
       }
     }
 
-    throw new Error('Invalid credentials');
+    throw new Error('invalid_credentials');
+  }
+
+  async validateToken(token?: string): Promise<object> {
+    // if (!token) throw new Error('invalid_token');
+
+    const decoded = await this.jwtService.verify(token, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    if (!decoded) throw new Error('invalid_token');
+
+    const userExists = await this.userService.getUserById(decoded?.sub);
+
+    if (!userExists) throw new Error('invalid_token');
+
+    const payload: UserPayload = {
+      id: userExists.id,
+      email: userExists.email,
+      cpf: userExists.cpf,
+      roles: userExists.roles,
+      name: userExists.name,
+      companyId: userExists.companyId,
+    };
+
+    return {
+      payload: { ...payload },
+      accessToken: token,
+    };
   }
 }

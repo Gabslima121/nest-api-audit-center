@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Inject, Post, Param } from '@nestjs/common';
-import { IsPublic } from '../auth/decorators/is-public.decorator';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Param,
+  HttpException,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
-import { CreateUserDTO, FindUserByEmailDTO } from './user.dto';
+import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -10,49 +20,92 @@ export class UserController {
   @Inject(UserService)
   private readonly userService: UserService;
 
+  @Get('me')
+  getUserByToken(@CurrentUser() user: User): User {
+    console.log(user);
+    return user;
+  }
+
   @Post('create')
   async createUser(
-    @Body() { cpf, email, name, password, roleId }: CreateUserDTO,
+    @Body()
+    { cpf, email, name, password, roleId, companyId, avatar }: CreateUserDTO,
   ) {
     try {
       return await this.userService.createUser({
         cpf,
         email,
         name,
-        password,
+        password: password || '12341234',
         roleId,
+        avatar,
+        companyId,
       });
     } catch (error) {
-      console.log(error);
-      return { error: error.message };
+      throw new HttpException(error.message, 400);
     }
   }
 
   @Get('by-email')
   async getUserByEmail(@Body() { email }: FindUserByEmailDTO) {
     try {
-      return this.userService.getUserByEmail({ email });
+      return await this.userService.getUserByEmail({ email });
     } catch (error) {
       console.log(error);
-      return { error: error.message };
+      throw new HttpException(error.message, 400);
     }
   }
 
   @Get()
   async listAllUsers(): Promise<User[]> {
     try {
-      return this.userService.getAllUsers();
+      return await this.userService.getAllUsers();
     } catch (error) {
-      return error;
+      throw new HttpException(error.message, 400);
     }
   }
 
   @Get('/:id')
   async getUserById(@Param() id: string): Promise<User | object> {
     try {
-      return this.userService.getUserById(id);
+      return await this.userService.getUserById(id);
     } catch (error) {
-      return { error: error.message };
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Put('update/:userId')
+  async updateUser(
+    @Body() { email, name }: UpdateUserDTO,
+    @Param() { userId }: UpdateUserDTO,
+  ): Promise<object | void> {
+    try {
+      return await this.userService.updateUser({ userId, email, name });
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('get-user-by-company/:companyId')
+  async getUserByCompanyId(@Param('companyId') companyId: string) {
+    try {
+      return await this.userService.getUserByCompanyId(companyId);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Delete('delete/:id')
+  public async deleteUserById(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+  ) {
+    try {
+      await this.userService.checkIfUserIsAdmin(user?.id);
+
+      return await this.userService.deleteUserById(id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
     }
   }
 }

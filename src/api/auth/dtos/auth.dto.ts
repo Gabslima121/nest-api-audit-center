@@ -9,16 +9,20 @@ export interface AuthRequest extends Request {
 }
 
 export interface UserPayload {
-  sub: string;
+  id?: string;
+  sub?: string;
   email: string;
   cpf: string;
   roles: Role[];
+  name: string;
   iat?: number;
   exp?: number;
+  companyId: string;
 }
 
 export interface UserToken {
   accessToken: string;
+  user: User;
 }
 
 export interface UserFromJwt {
@@ -32,4 +36,8 @@ export class LoginRequestBody {
 
   @IsString()
   password: string;
+}
+
+export interface ValidateToken {
+  token?: string;
 }

@@ -8,10 +8,17 @@ interface CreateUserDTO {
   avatar?: string;
   isDeleted?: boolean;
   roleId: Role[] | string[];
+  companyId?: string;
 }
 
 interface FindUserByEmailDTO {
   email: string;
 }
 
-export { CreateUserDTO, FindUserByEmailDTO };
+interface UpdateUserDTO {
+  name: string;
+  email: string;
+  userId: string;
+}
+
+export { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO };

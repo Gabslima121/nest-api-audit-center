@@ -8,42 +8,48 @@ import {
   DeleteDateColumn,
   ManyToMany,
   JoinTable,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { Company } from '../company/company.entity';
 import { Role } from '../role/role.entity';
 
 @Entity('users')
 class User {
   @PrimaryColumn()
-  id: string;
+  id?: string;
 
   @Column()
-  name: string;
+  name?: string;
 
   @Column()
-  email: string;
+  email?: string;
 
   @Exclude({ toPlainOnly: true })
   @Column()
-  password: string;
+  password?: string;
 
   @Column()
-  cpf: string;
+  cpf?: string;
 
   @Column({ nullable: true })
-  avatar: string;
+  avatar?: string;
 
   @Column({ name: 'is_deleted', default: false })
-  isDeleted: boolean;
+  isDeleted?: boolean;
 
+  @Exclude()
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt?: Date;
 
+  @Exclude()
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt?: Date;
 
+  @Exclude()
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt: Date;
+  deletedAt?: Date;
 
   @ManyToMany((type) => Role, (role) => role.users)
   @JoinTable({
@@ -58,6 +64,13 @@ class User {
     },
   })
   roles?: Role[];
+
+  @Column({ name: 'company_id', nullable: true })
+  companyId?: string;
+
+  @JoinColumn({ name: 'company_id' })
+  @ManyToOne(() => Company)
+  companies?: Company;
 
   constructor() {
     if (!this.id) {
