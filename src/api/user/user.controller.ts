@@ -7,6 +7,7 @@ import {
   Param,
   HttpException,
   Put,
+  Delete,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
@@ -35,7 +36,7 @@ export class UserController {
         cpf,
         email,
         name,
-        password,
+        password: password || '12341234',
         roleId,
         avatar,
         companyId,
@@ -89,6 +90,20 @@ export class UserController {
   async getUserByCompanyId(@Param('companyId') companyId: string) {
     try {
       return await this.userService.getUserByCompanyId(companyId);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Delete('delete/:id')
+  public async deleteUserById(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+  ) {
+    try {
+      await this.userService.checkIfUserIsAdmin(user?.id);
+
+      return await this.userService.deleteUserById(id);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

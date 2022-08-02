@@ -234,4 +234,22 @@ export class TicketsService {
       message: 'ticket_not_updated',
     };
   }
+
+  public async deleteTicket(id: string): Promise<object> {
+    const ticket = await this.findTicketById(id);
+
+    const isDeleted = await this.ticketsRepository.softDelete(ticket?.id);
+
+    if (isDeleted) {
+      return {
+        status: 'success',
+        message: 'ticket_deleted',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'ticket_not_deleted',
+    };
+  }
 }

@@ -239,5 +239,23 @@ class UserService {
 
     return user;
   }
+
+  async deleteUserById(id: string): Promise<object | void> {
+    const user = await this.getUserById(id);
+
+    const deletedUser = await this.userRepository.softDelete(user?.id);
+
+    if (deletedUser) {
+      return {
+        status: 'success',
+        message: 'user_deleted',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'user_not_deleted',
+    };
+  }
 }
 export { UserService };

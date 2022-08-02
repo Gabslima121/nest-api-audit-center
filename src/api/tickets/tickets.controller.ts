@@ -81,7 +81,7 @@ export class TicketsController {
   }
 
   @Delete('delete/:id/:companyId')
-  public async deleteTicket(
+  public async deleteTicketByCompanyId(
     @Param('id') id: string,
     @Param('companyId') companyId: string,
   ): Promise<void> {
@@ -125,6 +125,15 @@ export class TicketsController {
         title,
         description: description || null,
       });
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Delete('delete/:id')
+  public async deleteTicketById(@Param('id') id: string): Promise<object> {
+    try {
+      return await this.ticketsService.deleteTicket(id);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
