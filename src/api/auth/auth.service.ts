@@ -23,6 +23,7 @@ export class AuthService {
       roles: user.roles,
       name: user.name,
       companyId: user.companyId,
+      company: user.companies,
     };
 
     const jwtToken = this.jwtService.sign(payload);
@@ -45,6 +46,7 @@ export class AuthService {
           name: user.name,
           roles: mappedRoles,
           companyId: user.companyId,
+          company: user.companies,
         };
       }
     }
@@ -72,6 +74,7 @@ export class AuthService {
       roles: userExists.roles,
       name: userExists.name,
       companyId: userExists.companyId,
+      company: userExists.companies,
     };
 
     return {

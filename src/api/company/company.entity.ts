@@ -4,12 +4,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { Sla } from '../sla/sla.entity';
 
 @Entity('company')
 class Company {
@@ -44,15 +42,15 @@ class Company {
   complement?: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   updatedAt!: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   deletedAt!: Date;
 
   // @ManyToOne(() => Sla, (sla) => sla.company)
