@@ -4,10 +4,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
+import { Tickets } from '../tickets/tickets.entity';
 
 @Entity('company')
 class Company {
@@ -53,8 +55,8 @@ class Company {
   @Exclude()
   deletedAt!: Date;
 
-  // @ManyToOne(() => Sla, (sla) => sla.company)
-  // slaId: Sla;
+  @OneToMany(() => Tickets, (ticket) => ticket.company)
+  tickets?: Tickets[];
 
   constructor() {
     if (!this.id) {

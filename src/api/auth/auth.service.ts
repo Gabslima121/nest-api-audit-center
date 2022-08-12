@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   async validateToken(token?: string): Promise<object> {
-    // if (!token) throw new Error('invalid_token');
+    if (!token) return {};
 
     const decoded = await this.jwtService.verify(token, {
       secret: process.env.JWT_SECRET,
@@ -78,7 +78,7 @@ export class AuthService {
     };
 
     return {
-      payload: { ...payload },
+      user: { ...payload },
       accessToken: token,
     };
   }

@@ -44,9 +44,7 @@ export class DepartmentsController {
   }
 
   @Get()
-  async findAllDepartments(@CurrentUser() user: User): Promise<Departments[]> {
-    await this.userService.checkIfUserIsAdmin(user.id);
-
+  async findAllDepartments(): Promise<Departments[]> {
     return this.departmentsService.findAllDepartments();
   }
 

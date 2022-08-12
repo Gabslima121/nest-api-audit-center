@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/user.entity';
@@ -65,6 +66,16 @@ export class CompanyController {
       await this.userService.checkIfUserIsAdmin(user.id);
 
       return await this.companyService.findAllCompanies();
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  @Get('companies-by-ticket-status')
+  async getCompaniesByTicket() {
+    try {
+      return await this.companyService.findAllCompaniesByTicket();
     } catch (error) {
       console.log(error);
       return error;
