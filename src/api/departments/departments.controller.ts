@@ -31,7 +31,7 @@ export class DepartmentsController {
     @CurrentUser() user: User,
   ): Promise<Departments> {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return this.departmentsService.createDepartment({
         name,

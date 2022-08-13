@@ -133,6 +133,13 @@ export class TicketsService {
   public async findTicketsByAnalystId(analystId: string) {
     const tickets = await this.ticketsRepository.find({
       where: { analystId },
+      relations: [
+        'analyst',
+        'responsable',
+        'company',
+        'responsableArea',
+        'sla',
+      ],
     });
 
     if (!tickets) {

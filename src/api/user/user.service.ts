@@ -2,7 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
 
-import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
+import {
+  CheckUserRole,
+  CreateUserDTO,
+  FindUserByEmailDTO,
+  UpdateUserDTO,
+} from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { RoleRepository } from '../role/role.repository';
@@ -120,6 +125,10 @@ class UserService {
       relations: ['roles', 'companies'],
     });
 
+    if (!user) {
+      throw new Error('user_not_found');
+    }
+
     return user;
   }
 
@@ -164,7 +173,7 @@ class UserService {
     return user;
   }
 
-  async checkIfUserIsAdmin(id: string): Promise<boolean> {
+  async checkUserRole(id: string): Promise<CheckUserRole> {
     const user = await this.userRepository.findOne(id, {
       select: [
         'companyId',
@@ -186,11 +195,34 @@ class UserService {
       (role) => role.name === 'ADMIN' || role.name === 'SUPER_ADMIN',
     );
 
-    if (!isAdmin) {
-      throw new Error('User is not admin');
+    const isAnalyst = user.roles.some((role) => role.name === 'ANALYST');
+
+    const isAuditor = user.roles.some((role) => role.name === 'AUDITOR');
+
+    if (isAdmin) {
+      return {
+        isAdmin: true,
+        message: 'User is admin',
+      };
     }
 
-    return true;
+    if (isAnalyst) {
+      return {
+        isAnalyst: true,
+        message: 'User is analyst',
+      };
+    }
+
+    if (isAuditor) {
+      return {
+        isAuditor: true,
+        message: 'User is auditor',
+      };
+    }
+
+    return {
+      message: 'User does not have permission to access this resource',
+    };
   }
 
   async updateUser({

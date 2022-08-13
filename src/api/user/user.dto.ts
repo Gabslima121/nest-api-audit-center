@@ -21,4 +21,13 @@ interface UpdateUserDTO {
   userId: string;
 }
 
-export { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO };
+interface CheckUserRole {
+  isAdmin?: boolean;
+  isAnalyst?: boolean;
+  isAuditor?: boolean;
+  isResponsable?: boolean;
+  isSuperAdmin?: boolean;
+  message: string;
+}
+
+export { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO, CheckUserRole };
