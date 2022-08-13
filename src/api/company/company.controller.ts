@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/user.entity';
@@ -41,7 +42,7 @@ export class CompanyController {
     @CurrentUser() user: User,
   ): Promise<Company> {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return await this.companyService.createCompany({
         cep,
@@ -62,9 +63,19 @@ export class CompanyController {
   @Get()
   async getAllCompanies(@CurrentUser() user: User): Promise<Company[]> {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return await this.companyService.findAllCompanies();
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  @Get('companies-by-ticket-status')
+  async getCompaniesByTicket() {
+    try {
+      return await this.companyService.findAllCompaniesByTicket();
     } catch (error) {
       console.log(error);
       return error;
@@ -77,7 +88,7 @@ export class CompanyController {
     @Param('id') id: string,
   ): Promise<void> {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return this.companyService.deleteCompany(id);
     } catch (error) {

@@ -4,12 +4,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { Sla } from '../sla/sla.entity';
+import { Tickets } from '../tickets/tickets.entity';
 
 @Entity('company')
 class Company {
@@ -44,19 +44,19 @@ class Company {
   complement?: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   updatedAt!: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   deletedAt!: Date;
 
-  // @ManyToOne(() => Sla, (sla) => sla.company)
-  // slaId: Sla;
+  @OneToMany(() => Tickets, (ticket) => ticket.company)
+  tickets?: Tickets[];
 
   constructor() {
     if (!this.id) {

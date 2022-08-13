@@ -30,7 +30,7 @@ export class SlaController {
     @CurrentUser() user: User,
   ) {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return await this.slaService.createSla({
         company,
@@ -47,7 +47,7 @@ export class SlaController {
   @Get('/:id')
   async getSlaById(@CurrentUser() user: User, @Param('id') id: string) {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return await this.slaService.findSlaById(id);
     } catch (error) {
@@ -61,7 +61,7 @@ export class SlaController {
     @Param('companyId') companyId: string,
   ) {
     try {
-      // await this.userService.checkIfUserIsAdmin(user.id);
+      // await this.userService.checkUserRole(user.id);
 
       return await this.slaService.findSlaByCompanyId(companyId);
     } catch (error) {
@@ -76,7 +76,7 @@ export class SlaController {
     @Body() { name, sla, typeSla, description }: UpdateSlaDTO,
   ) {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return await this.slaService.updateSla(id, {
         name,
@@ -92,7 +92,7 @@ export class SlaController {
   @Delete('delete/:id')
   async deleteSla(@CurrentUser() user: User, @Param('id') id: string) {
     try {
-      await this.userService.checkIfUserIsAdmin(user.id);
+      await this.userService.checkUserRole(user.id);
 
       return await this.slaService.deleteSla(id);
     } catch (error) {

@@ -101,7 +101,7 @@ export class UserController {
     @CurrentUser() user: User,
   ) {
     try {
-      await this.userService.checkIfUserIsAdmin(user?.id);
+      await this.userService.checkUserRole(user?.id);
 
       return await this.userService.deleteUserById(id);
     } catch (error) {

@@ -130,6 +130,25 @@ export class TicketsService {
     };
   }
 
+  public async findTicketsByAnalystId(analystId: string) {
+    const tickets = await this.ticketsRepository.find({
+      where: { analystId },
+      relations: [
+        'analyst',
+        'responsable',
+        'company',
+        'responsableArea',
+        'sla',
+      ],
+    });
+
+    if (!tickets) {
+      throw new Error('ticket_not_found');
+    }
+
+    return tickets;
+  }
+
   public async findTicketById(id: string): Promise<Tickets> {
     return this.ticketsRepository.findOne({
       where: { id },

@@ -1,5 +1,6 @@
 import { IsEmail, IsString } from 'class-validator';
 import { Request } from 'express';
+import { Company } from 'src/api/company/company.entity';
 import { Role } from 'src/api/role/role.entity';
 
 import { User } from 'src/api/user/user.entity';
@@ -18,6 +19,7 @@ export interface UserPayload {
   iat?: number;
   exp?: number;
   companyId: string;
+  company: Company;
 }
 
 export interface UserToken {

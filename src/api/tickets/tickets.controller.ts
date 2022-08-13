@@ -73,6 +73,17 @@ export class TicketsController {
     );
   }
 
+  @Get('get-by-analyst')
+  public async findTicketsByAnalyst(
+    @CurrentUser() user: User,
+  ): Promise<Tickets[]> {
+    try {
+      return this.ticketsService.findTicketsByAnalystId(user?.id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
   @Get('get-by-company/:companyId')
   public async findTicketsByCompany(
     @Param('companyId') companyId: string,

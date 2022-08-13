@@ -43,7 +43,27 @@ class CompanyService {
   }
 
   public async findAllCompanies(): Promise<Company[]> {
-    return await this.companyRepository.find();
+    return this.companyRepository.find({
+      relations: ['tickets'],
+    });
+  }
+
+  public async findAllCompaniesByTicket() {
+    const companies = await this.companyRepository
+      .createQueryBuilder('company')
+      .leftJoinAndSelect('company.tickets', 'ticket')
+      .getMany();
+
+    if (!companies) {
+      throw new Error('company_not_found');
+    }
+
+    return companies.map((company) => {
+      return {
+        company,
+        total: company?.tickets?.length,
+      };
+    });
   }
 
   public async findCompanyById(id: string): Promise<Company> {
