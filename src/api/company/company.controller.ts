@@ -42,7 +42,7 @@ export class CompanyController {
     @CurrentUser() user: User,
   ): Promise<Company> {
     try {
-      await this.userService.checkUserRole(user.id);
+      this.userService._checkUserRole(user);
 
       return await this.companyService.createCompany({
         cep,
@@ -63,9 +63,13 @@ export class CompanyController {
   @Get()
   async getAllCompanies(@CurrentUser() user: User): Promise<Company[]> {
     try {
-      await this.userService.checkUserRole(user.id);
+      const userExist = await this.userService.getUserById(user?.id);
 
-      return await this.companyService.findAllCompanies();
+      const { isAdmin } = this.userService._checkUserRole(userExist);
+
+      if (isAdmin) {
+        return await this.companyService.findAllCompanies();
+      }
     } catch (error) {
       console.log(error);
       return error;
@@ -88,7 +92,7 @@ export class CompanyController {
     @Param('id') id: string,
   ): Promise<void> {
     try {
-      await this.userService.checkUserRole(user.id);
+      this.userService._checkUserRole(user);
 
       return this.companyService.deleteCompany(id);
     } catch (error) {

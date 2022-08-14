@@ -86,10 +86,36 @@ export class UserController {
     }
   }
 
-  @Get('get-user-by-company/:companyId')
-  async getUserByCompanyId(@Param('companyId') companyId: string) {
+  @Get('get-user-by-company-and-department/:companyId/:departmentId')
+  async getUserByCompanyId(
+    @Param('companyId') companyId: string,
+    @Param('departmentId') departmentId?: string,
+  ) {
     try {
-      return await this.userService.getUserByCompanyId(companyId);
+      return await this.userService.getUserByCompanyIdAndDepartmentId(
+        companyId,
+        departmentId,
+      );
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('get-user-by-deparment/:departmentId')
+  async getUserByDepartmentId(
+    @Param('departmentId') departmentId: string,
+  ): Promise<User[]> {
+    try {
+      return await this.userService.getUserByDepartmentId(departmentId);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('get-auditor-by-company/:companyId')
+  async getAuditorsByCompanyId(@Param('companyId') companyId: string) {
+    try {
+      return await this.userService.getAuditorsByCompanyId(companyId);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
@@ -101,7 +127,7 @@ export class UserController {
     @CurrentUser() user: User,
   ) {
     try {
-      await this.userService.checkUserRole(user?.id);
+      this.userService._checkUserRole(user);
 
       return await this.userService.deleteUserById(id);
     } catch (error) {

@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Company } from '../company/company.entity';
+import { Departments } from '../departments/departments.entity';
 import { Role } from '../role/role.entity';
 
 @Entity('users')
@@ -71,6 +72,13 @@ class User {
   @JoinColumn({ name: 'company_id' })
   @ManyToOne(() => Company)
   companies?: Company;
+
+  @Column({ name: 'department_id', nullable: true })
+  departmentId: string;
+
+  @JoinColumn({ name: 'department_id' })
+  @ManyToOne(() => Departments)
+  department?: Departments;
 
   constructor() {
     if (!this.id) {

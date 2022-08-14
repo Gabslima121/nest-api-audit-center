@@ -30,4 +30,16 @@ interface CheckUserRole {
   message: string;
 }
 
-export { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO, CheckUserRole };
+interface UsersByCompany {
+  analysts: object[];
+  auditors: object[];
+  admins: object[];
+}
+
+export {
+  CreateUserDTO,
+  FindUserByEmailDTO,
+  UpdateUserDTO,
+  CheckUserRole,
+  UsersByCompany,
+};
