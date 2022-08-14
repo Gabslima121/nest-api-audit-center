@@ -29,7 +29,16 @@ export class UserController {
   @Post('create')
   async createUser(
     @Body()
-    { cpf, email, name, password, roleId, companyId, avatar }: CreateUserDTO,
+    {
+      cpf,
+      email,
+      name,
+      password,
+      roleId,
+      companyId,
+      avatar,
+      departmentId,
+    }: CreateUserDTO,
   ) {
     try {
       return await this.userService.createUser({
@@ -40,6 +49,7 @@ export class UserController {
         roleId,
         avatar,
         companyId,
+        departmentId,
       });
     } catch (error) {
       throw new HttpException(error.message, 400);
@@ -116,6 +126,15 @@ export class UserController {
   async getAuditorsByCompanyId(@Param('companyId') companyId: string) {
     try {
       return await this.userService.getAuditorsByCompanyId(companyId);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('get-analysts-by-company/:companyId')
+  async getAnalystsByCompanyId(@Param('companyId') companyId: string) {
+    try {
+      return await this.userService.getAnalystsByCompanyId(companyId);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

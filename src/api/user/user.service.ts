@@ -18,6 +18,7 @@ import { UserRole } from '../user-role/user-role.entity';
 import { CompanyRepository } from '../company/company.repository';
 import { CompanyService } from '../company/company.service';
 import { ROLES } from '../../shared/helpers/constants';
+import { DepartmentsService } from '../departments/departments.service';
 
 @Injectable()
 class UserService {
@@ -37,6 +38,9 @@ class UserService {
   @Inject(CompanyService)
   private readonly companyService: CompanyService;
 
+  @Inject(DepartmentsService)
+  private readonly departmentsService: DepartmentsService;
+
   public async createUser({
     name,
     avatar,
@@ -46,6 +50,7 @@ class UserService {
     password,
     roleId,
     companyId,
+    departmentId,
   }: CreateUserDTO): Promise<User> {
     const user = new User();
     const userRole = new UserRole();
@@ -57,6 +62,9 @@ class UserService {
     await this.checkIfUserExists(email, cpf);
 
     const company = await this.companyService.findCompanyById(companyId);
+    const department = await this.departmentsService.findDepartmentById(
+      departmentId,
+    );
 
     const hashedPassword = await hash(password, 12);
 
@@ -71,6 +79,7 @@ class UserService {
     user.isDeleted = isDeleted || false;
     user.password = hashedPassword;
     user.companyId = company.id;
+    user.departmentId = department.id;
 
     const newUser = await this.userRepository.save(user);
 
@@ -363,6 +372,12 @@ class UserService {
     const { auditors } = await this.getAllUserByCompanyId(companyId);
 
     return auditors;
+  }
+
+  async getAnalystsByCompanyId(companyId: string): Promise<object> {
+    const { analysts } = await this.getAllUserByCompanyId(companyId);
+
+    return analysts;
   }
 }
 export { UserService };
