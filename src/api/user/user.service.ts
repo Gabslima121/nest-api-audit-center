@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
-import { forEach, reduce } from 'lodash';
+import { forEach, isEmpty, reduce } from 'lodash';
 
 import {
   CheckUserRole,
@@ -186,6 +186,10 @@ class UserService {
   }
 
   _checkUserRole(user: User): CheckUserRole {
+    if (isEmpty(user.roles)) {
+      throw new Error('user_has_no_roles');
+    }
+
     const isAdmin = user.roles.some(
       (role) => role.name === 'ADMIN' || role.name === 'SUPER_ADMIN',
     );
@@ -282,10 +286,16 @@ class UserService {
     };
   }
 
-  async deleteUserById(id: string): Promise<object | void> {
-    const user = await this.getUserById(id);
+  async deleteUserById(id: string, currentUser: User): Promise<object | void> {
+    const userExists = await this.getUserById(id);
+    const currentUserExists = await this.getUserById(currentUser?.id);
+    const { isAdmin } = this._checkUserRole(currentUserExists);
 
-    const deletedUser = await this.userRepository.softDelete(user?.id);
+    if (!isAdmin) {
+      throw new Error('user_not_authorized');
+    }
+
+    const deletedUser = await this.userRepository.softDelete(userExists?.id);
 
     if (deletedUser) {
       return {

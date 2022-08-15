@@ -28,11 +28,8 @@ export class DepartmentsController {
     @Body()
     { name, description }: CreateDepartmentDTO,
     @Param('companyId') companyId: string,
-    @CurrentUser() user: User,
   ): Promise<Departments> {
     try {
-      this.userService._checkUserRole(user);
-
       return this.departmentsService.createDepartment({
         name,
         companyId,

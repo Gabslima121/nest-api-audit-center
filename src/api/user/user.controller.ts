@@ -146,9 +146,7 @@ export class UserController {
     @CurrentUser() user: User,
   ) {
     try {
-      this.userService._checkUserRole(user);
-
-      return await this.userService.deleteUserById(id);
+      return await this.userService.deleteUserById(id, user);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
