@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  await app.listen(port, () => {
+  await app.listen(port || 3200, () => {
     console.log('[WEB]', config.get<string>('BASE_URL'));
   });
 }
