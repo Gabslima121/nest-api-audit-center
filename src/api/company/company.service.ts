@@ -48,7 +48,7 @@ class CompanyService {
     });
   }
 
-  public async findAllCompaniesByTicket() {
+  public async findAllCompaniesAndEachTicket() {
     const companies = await this.companyRepository
       .createQueryBuilder('company')
       .leftJoinAndSelect('company.tickets', 'ticket')
@@ -119,6 +119,33 @@ class CompanyService {
       street,
       complement,
     });
+  }
+
+  private _mapCompanyAndTicket(companies) {
+    return companies.map((company) => {
+      return {
+        company,
+        total: company?.tickets?.length,
+      };
+    });
+  }
+
+  public async findCompanyAndEachTicketByStatus(
+    status: string,
+  ): Promise<object> {
+    const companies = await this.companyRepository
+      .createQueryBuilder('company')
+      .leftJoinAndSelect('company.tickets', 'ticket')
+      .where('ticket.status = :status', { status })
+      .getMany();
+
+    if (!companies) {
+      throw new Error('company_not_found');
+    }
+
+    const teste = this._mapCompanyAndTicket(companies);
+
+    return teste;
   }
 }
 

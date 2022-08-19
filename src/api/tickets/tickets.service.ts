@@ -271,4 +271,35 @@ export class TicketsService {
       message: 'ticket_not_deleted',
     };
   }
+
+  // private _mapTicketAndDepartment(tickets) {
+  //   return tickets.map((ticket) => {
+  //     return {
+  //       ticket,
+  //       total: ticket?.depar?.length,
+  //     };
+  //   });
+  // }
+
+  public async findTicketsAndDepartments() {
+    const tickets = await this.ticketsRepository
+      .createQueryBuilder('tickets')
+      .select([
+        'tickets.id',
+        'tickets.title',
+        'responsableArea.id',
+        'responsableArea.name',
+        ' company.id',
+        'company.corporateName',
+      ])
+      .leftJoin('tickets.responsableArea', 'responsableArea')
+      .leftJoin('responsableArea.company', 'company')
+      .getMany();
+
+    if (!tickets) {
+      throw new Error('tickets_not_found');
+    }
+
+    return tickets;
+  }
 }

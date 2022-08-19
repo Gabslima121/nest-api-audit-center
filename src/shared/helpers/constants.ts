@@ -4,3 +4,10 @@ export const TICKET_ITEM_STATUS = {
   DONE: 'DONE',
   CANCELED: 'CANCELED',
 };
+
+export const ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  ANALYST: 'ANALYST',
+  AUDITOR: 'AUDITOR',
+};

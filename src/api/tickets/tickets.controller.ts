@@ -21,6 +21,15 @@ export class TicketsController {
   @Inject(TicketsService)
   private readonly ticketsService: TicketsService;
 
+  @Get('/get-tickets-and-departments')
+  public async getTicketsAndDepartments() {
+    try {
+      return await this.ticketsService.findTicketsAndDepartments();
+    } catch (e) {
+      throw new HttpException(e.message, 400);
+    }
+  }
+
   @Post('create')
   public async createTicket(
     @Body()

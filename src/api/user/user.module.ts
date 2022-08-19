@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CompanyModule } from '../company/company.module';
 import { CompanyRepository } from '../company/company.repository';
 import { CompanyService } from '../company/company.service';
+import { DepartmentsService } from '../departments/departments.service';
 import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserController } from './user.controller';
@@ -11,7 +11,7 @@ import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), CompanyModule],
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [
     UserService,
@@ -20,6 +20,7 @@ import { UserService } from './user.service';
     UserRoleRepository,
     CompanyRepository,
     CompanyService,
+    DepartmentsService,
   ],
   exports: [UserService, UserRepository],
 })
