@@ -42,7 +42,7 @@ export class CompanyController {
     @CurrentUser() user: User,
   ): Promise<Company> {
     try {
-      this.userService._checkUserRole(user);
+      // this.userService._checkUserRole(user);
 
       return await this.companyService.createCompany({
         cep,
@@ -76,10 +76,20 @@ export class CompanyController {
     }
   }
 
-  @Get('companies-by-ticket-status')
+  @Get('companies-and-tickets')
   async getCompaniesByTicket() {
     try {
-      return await this.companyService.findAllCompaniesByTicket();
+      return await this.companyService.findAllCompaniesAndEachTicket();
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  @Get('companies-and-tickets-by-status')
+  async getCompaniesByTicketByStatus(@Query('status') status: string) {
+    try {
+      return await this.companyService.findCompanyAndEachTicketByStatus(status);
     } catch (error) {
       console.log(error);
       return error;
