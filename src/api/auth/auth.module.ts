@@ -4,8 +4,6 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { loginValidaitonMiddleware } from 'src/middlewares/login-validation.middleware';
 import { RoleModule } from '../role/role.module';
-import { RoleRepository } from '../role/role.repository';
-import { RoleService } from '../role/role.service';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

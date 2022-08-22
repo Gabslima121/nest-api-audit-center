@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -9,6 +10,7 @@ import { JwtAuthGuard } from './api/auth/guards/jwt-auth.guard';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+    ConfigModule.forRoot({ isGlobal: true }),
     ApiModule,
   ],
   controllers: [],
