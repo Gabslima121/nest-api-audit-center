@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
-import { forEach, isEmpty, reduce } from 'lodash';
+import { forEach, isEmpty } from 'lodash';
 
 import {
   CheckUserRole,
@@ -12,27 +12,20 @@ import {
 } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
-import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
-import { CompanyRepository } from '../company/company.repository';
 import { CompanyService } from '../company/company.service';
-import { ROLES } from '../../shared/helpers/constants';
 import { DepartmentsService } from '../departments/departments.service';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 class UserService {
   private userRepository: UserRepository;
-  private roleRepository: RoleRepository;
   private userRoleRepository: UserRoleRepository;
-  private companyRepository: CompanyRepository;
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
-    this.roleRepository = this.connection.getCustomRepository(RoleRepository);
     this.userRoleRepository =
       this.connection.getCustomRepository(UserRoleRepository);
-    this.companyRepository =
-      this.connection.getCustomRepository(CompanyRepository);
   }
 
   @Inject(CompanyService)
@@ -40,6 +33,9 @@ class UserService {
 
   @Inject(DepartmentsService)
   private readonly departmentsService: DepartmentsService;
+
+  @Inject(RoleService)
+  private readonly roleService: RoleService;
 
   public async createUser({
     name,
@@ -68,9 +64,7 @@ class UserService {
 
     const hashedPassword = await hash(password, 12);
 
-    const role = await this.roleRepository.findOne({
-      where: { id: roleId },
-    });
+    const role = await this.roleService.findRoleById(roleId);
 
     user.name = name;
     user.avatar = avatar || '';
@@ -78,8 +72,8 @@ class UserService {
     user.email = email;
     user.isDeleted = isDeleted || false;
     user.password = hashedPassword;
-    user.companyId = company.id;
-    user.departmentId = department.id;
+    user.companyId = company?.id;
+    user.departmentId = department?.id;
 
     const newUser = await this.userRepository.save(user);
 

@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { CreateRoleDTO } from './role.dto';
 import { Role } from './role.entity';
+import { RoleRepository } from './role.repository';
 
 @Injectable()
 export class RoleService {
-  @InjectRepository(Role)
-  private readonly roleRepository: Repository<Role>;
+  private roleRepository: RoleRepository;
+  constructor(private readonly connection: Connection) {
+    this.roleRepository = this.connection.getCustomRepository(RoleRepository);
+  }
 
   public async createRole({ name }: CreateRoleDTO): Promise<Role> {
     const role = new Role();
@@ -24,13 +27,23 @@ export class RoleService {
   }
 
   public mapRoles(roles: Role[]) {
-    const mappedRoles = roles.map((role) => {
+    return roles.map((role) => {
       return {
         id: role.id,
         name: role.name,
       };
     });
+  }
 
-    return mappedRoles;
+  public async findRoleById(id: any): Promise<Role> {
+    const role = await this.roleRepository.findOne({
+      where: { id },
+    });
+
+    if (!role) {
+      throw new Error('role_not_found');
+    }
+
+    return role;
   }
 }

@@ -20,13 +20,7 @@ export class UserController {
   @Inject(UserService)
   private readonly userService: UserService;
 
-  @Get('me')
-  getUserByToken(@CurrentUser() user: User): User {
-    console.log(user);
-    return user;
-  }
-
-  @Post('create')
+  @Post('/create')
   async createUser(
     @Body()
     {
@@ -54,6 +48,12 @@ export class UserController {
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
+  }
+
+  @Get('me')
+  getUserByToken(@CurrentUser() user: User): User {
+    console.log(user);
+    return user;
   }
 
   @Get('by-email')

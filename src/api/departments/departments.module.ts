@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CompanyService } from '../company/company.service';
+import { RoleService } from '../role/role.service';
 import { UserService } from '../user/user.service';
 import { DepartmentsController } from './departments.controller';
 import { Departments } from './departments.entity';
@@ -16,6 +17,7 @@ import { DepartmentsService } from './departments.service';
     DepartmentsRepository,
     CompanyService,
     UserService,
+    RoleService,
   ],
   exports: [DepartmentsService, DepartmentsRepository],
 })

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyService } from '../company/company.service';
 import { DepartmentsService } from '../departments/departments.service';
+import { RoleService } from '../role/role.service';
 import { SlaService } from '../sla/sla.service';
 import { UserService } from '../user/user.service';
 import { TicketsController } from './tickets.controller';
@@ -19,6 +20,7 @@ import { TicketsService } from './tickets.service';
     CompanyService,
     DepartmentsService,
     SlaService,
+    RoleService,
   ],
   exports: [TicketsService, TicketsRepository],
 })

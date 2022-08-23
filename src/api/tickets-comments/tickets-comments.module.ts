@@ -7,6 +7,7 @@ import { SlaService } from '../sla/sla.service';
 import { DepartmentsService } from '../departments/departments.service';
 import { UserService } from '../user/user.service';
 import { CompanyService } from '../company/company.service';
+import { RoleService } from '../role/role.service';
 
 @Module({
   imports: [],
@@ -18,6 +19,7 @@ import { CompanyService } from '../company/company.service';
     SlaService,
     DepartmentsService,
     CompanyService,
+    RoleService,
   ],
   controllers: [TicketsCommentsController],
 })
