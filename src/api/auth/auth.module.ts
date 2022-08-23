@@ -19,7 +19,7 @@ const jwtSecret = process.env.JWT_SECRET;
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET') || jwtSecret,
+        secretOrPrivateKey: configService.get('JWT_SECRET') || jwtSecret,
         signOptions: { expiresIn: '1d' },
       }),
       inject: [ConfigService],
