@@ -1,4 +1,4 @@
-import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
@@ -19,7 +19,7 @@ const jwtSecret = process.env.JWT_SECRET;
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: jwtSecret,
+        secret: configService.get('JWT_SECRET') || jwtSecret,
         signOptions: { expiresIn: '1d' },
       }),
       inject: [ConfigService],
