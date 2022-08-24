@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   Body,
+  Get,
 } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
@@ -30,5 +31,14 @@ export class AuthController {
   @Post('validate-token')
   async validateToken(@Body() { token }: ValidateToken) {
     return this.authService.validateToken(token);
+  }
+
+  @IsPublic()
+  @Get()
+  apiIsRunnig() {
+    return {
+      status: 'up',
+      message: 'Api is running',
+    };
   }
 }
