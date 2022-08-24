@@ -10,6 +10,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { IsPublic } from '../auth/decorators/is-public.decorator';
 
 import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
 import { User } from './user.entity';
@@ -20,6 +21,7 @@ export class UserController {
   @Inject(UserService)
   private readonly userService: UserService;
 
+  @IsPublic()
   @Post('/create')
   async createUser(
     @Body()

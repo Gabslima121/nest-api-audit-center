@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { IsPublic } from '../auth/decorators/is-public.decorator';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
 import { CreateCompanyDTO } from './company.dto';
@@ -25,6 +26,7 @@ export class CompanyController {
   @Inject(UserService)
   private readonly userService: UserService;
 
+  @IsPublic()
   @Post('create')
   async createCompany(
     @Body()
