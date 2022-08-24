@@ -22,9 +22,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       cli: {
         migrationsDir: 'src/database/migrations',
       },
-      extra: {
-        ssl: true,
-      },
+      // extra: {
+      //   ssl: true,
+      // },
     };
   }
 }
