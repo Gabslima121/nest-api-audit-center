@@ -11,6 +11,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
     return {
       type: 'postgres',
       migrationsRun: true,
+      url: this.config.get('DATABASE_URL'),
       host: this.config.get('DATABASE_HOST'),
       port: this.config.get('DATABASE_PORT'),
       database: this.config.get('DATABASE_NAME'),
