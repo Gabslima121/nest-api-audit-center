@@ -10,7 +10,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { IsPublic } from '../auth/decorators/is-public.decorator';
 
 import { CreateUserDTO, FindUserByEmailDTO, UpdateUserDTO } from './user.dto';
 import { User } from './user.entity';
@@ -21,7 +20,6 @@ export class UserController {
   @Inject(UserService)
   private readonly userService: UserService;
 
-  @IsPublic()
   @Post('/create')
   async createUser(
     @Body()
@@ -86,20 +84,8 @@ export class UserController {
     }
   }
 
-  @Put('update/:userId')
-  async updateUser(
-    @Body() { email, name }: UpdateUserDTO,
-    @Param() { userId }: UpdateUserDTO,
-  ): Promise<object | void> {
-    try {
-      return await this.userService.updateUser({ userId, email, name });
-    } catch (error) {
-      throw new HttpException(error.message, 400);
-    }
-  }
-
   @Get('get-user-by-company-and-department/:companyId/:departmentId')
-  async getUserByCompanyId(
+  async getUserByCompanyIdAndDepartmentId(
     @Param('companyId') companyId: string,
     @Param('departmentId') departmentId?: string,
   ) {
@@ -108,6 +94,18 @@ export class UserController {
         companyId,
         departmentId,
       );
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Put('update/:userId')
+  async updateUser(
+    @Body() { email, name }: UpdateUserDTO,
+    @Param() { userId }: UpdateUserDTO,
+  ): Promise<object | void> {
+    try {
+      return await this.userService.updateUser({ userId, email, name });
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

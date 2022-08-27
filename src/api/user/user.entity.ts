@@ -52,7 +52,7 @@ class User {
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt?: Date;
 
-  @ManyToMany((type) => Role, (role) => role.users)
+  @ManyToMany(() => Role, (role) => role.users)
   @JoinTable({
     name: 'user_roles',
     joinColumn: {
@@ -74,7 +74,7 @@ class User {
   companies?: Company;
 
   @Column({ name: 'department_id', nullable: true })
-  departmentId: string;
+  departmentId?: string;
 
   @JoinColumn({ name: 'department_id' })
   @ManyToOne(() => Departments)

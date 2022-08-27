@@ -1,11 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
-import * as moment from 'moment';
 
-import { TicketsService } from '../tickets/tickets.service';
 import { CreateTicketComment } from './tickets-comments.dto';
 import { TicketsComments } from './tickets-comments.entity';
 import { TicketsCommentsRepository } from './tickets-comments.repository';
+import { TicketsService } from '../tickets/tickets.service';
 
 @Injectable()
 export class TicketsCommentsService {

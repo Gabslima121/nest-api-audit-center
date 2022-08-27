@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { CompanyService } from '../company/company.service';
+import { User } from '../user/user.entity';
+import { UserService } from '../user/user.service';
 import { CreateSlaDTO, UpdateSlaDTO } from './sla.dto';
 import { Sla } from './sla.entity';
 
@@ -13,17 +15,23 @@ export class SlaService {
     this.slaRepository = this.connection.getCustomRepository(SlaRepository);
   }
 
+  @Inject(UserService)
+  private readonly userService: UserService;
+
   @Inject(CompanyService)
   private readonly companyService: CompanyService;
 
-  public async createSla({
-    company,
-    name,
-    sla,
-    typeSla,
-    description,
-  }: CreateSlaDTO): Promise<Sla> {
+  public async createSla(
+    { company, name, sla, typeSla, description }: CreateSlaDTO,
+    user: User,
+  ): Promise<Sla> {
     const newSla = new Sla();
+
+    const { isAdmin } = await this.userService._checkUserRole(user);
+
+    if (!isAdmin) {
+      throw new Error('user_not_admin');
+    }
 
     const companyExists = await this.companyService.findCompanyById(company);
 
@@ -65,7 +73,14 @@ export class SlaService {
   public async updateSla(
     id: string,
     { name, sla, typeSla, description }: UpdateSlaDTO,
+    user: User,
   ): Promise<object> {
+    const { isAdmin } = await this.userService._checkUserRole(user);
+
+    if (!isAdmin) {
+      throw new Error('user_not_admin');
+    }
+
     const slaExists = await this.findSlaById(id);
 
     const updatedSla = await this.slaRepository.update(slaExists.id, {
@@ -88,7 +103,13 @@ export class SlaService {
     };
   }
 
-  public async deleteSla(id: string): Promise<object> {
+  public async deleteSla(id: string, user: User): Promise<object> {
+    const { isAdmin } = await this.userService._checkUserRole(user);
+
+    if (!isAdmin) {
+      throw new Error('user_not_admin');
+    }
+
     const slaExists = await this.findSlaById(id);
 
     const deletedSla = await this.slaRepository.softDelete(slaExists.id);

@@ -1,26 +1,19 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { TicketsCommentsService } from './tickets-comments.service';
 import { TicketsCommentsController } from './tickets-comments.controller';
 import { TicketsCommentsRepository } from './tickets-comments.repository';
-import { TicketsService } from '../tickets/tickets.service';
-import { SlaService } from '../sla/sla.service';
-import { DepartmentsService } from '../departments/departments.service';
-import { UserService } from '../user/user.service';
-import { CompanyService } from '../company/company.service';
-import { RoleService } from '../role/role.service';
+import { TicketsComments } from './tickets-comments.entity';
+import { TicketsModule } from '../tickets/tickets.module';
 
 @Module({
-  imports: [],
-  providers: [
-    TicketsCommentsService,
-    TicketsCommentsRepository,
-    TicketsService,
-    UserService,
-    SlaService,
-    DepartmentsService,
-    CompanyService,
-    RoleService,
+  imports: [
+    TypeOrmModule.forFeature([TicketsComments]),
+    forwardRef(() => TicketsModule),
   ],
+  providers: [TicketsCommentsService, TicketsCommentsRepository],
   controllers: [TicketsCommentsController],
+  exports: [TicketsCommentsService, TicketsCommentsRepository],
 })
 export class TicketsCommentsModule {}

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
@@ -20,16 +20,16 @@ export class TicketsService {
       this.connection.getCustomRepository(TicketsRepository);
   }
 
-  @Inject(UserService)
+  @Inject(forwardRef(() => UserService))
   private readonly userService: UserService;
 
-  @Inject(CompanyService)
+  @Inject(forwardRef(() => CompanyService))
   private readonly companyService: CompanyService;
 
-  @Inject(DepartmentsService)
+  @Inject(forwardRef(() => DepartmentsService))
   private readonly departmentsSerivce: DepartmentsService;
 
-  @Inject(SlaService)
+  @Inject(forwardRef(() => SlaService))
   private readonly slaSerivce: SlaService;
 
   public async createTicket({

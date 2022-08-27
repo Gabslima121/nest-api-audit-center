@@ -8,20 +8,13 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { User } from '../user/user.entity';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateDepartmentDTO } from './departments.dto';
 import { Departments } from './departments.entity';
 import { DepartmentsService } from './departments.service';
-import { UserService } from '../user/user.service';
-
 @Controller('departments')
 export class DepartmentsController {
   @Inject(DepartmentsService)
   private readonly departmentsService: DepartmentsService;
-
-  @Inject(UserService)
-  private readonly userService: UserService;
 
   @Post('create/:companyId')
   public async createDepartment(

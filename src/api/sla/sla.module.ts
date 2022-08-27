@@ -1,25 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CompanyService } from '../company/company.service';
-import { DepartmentsService } from '../departments/departments.service';
-import { RoleService } from '../role/role.service';
-import { UserService } from '../user/user.service';
+import { CompanyModule } from '../company/company.module';
+import { UserModule } from '../user/user.module';
 import { SlaController } from './sla.controller';
 import { Sla } from './sla.entity';
 import { SlaRepository } from './sla.repository';
 import { SlaService } from './sla.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sla])],
+  imports: [TypeOrmModule.forFeature([Sla]), UserModule, CompanyModule],
   controllers: [SlaController],
-  providers: [
-    SlaService,
-    SlaRepository,
-    CompanyService,
-    UserService,
-    DepartmentsService,
-    RoleService,
-  ],
+  providers: [SlaService, SlaRepository],
   exports: [SlaService, SlaRepository],
 })
 export class SlaModule {}
