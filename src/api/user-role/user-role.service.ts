@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 
 import { UserRole } from './user-role.entity';
-import { UserRepository } from '../user/user.repository';
-import { RoleRepository } from '../role/role.repository';
 import { UserRoleRepository } from './user-role.repository';
 import { RoleService } from '../role/role.service';
 import { UserService } from '../user/user.service';
@@ -16,10 +14,10 @@ export class UserRoleService {
       this.connection.getCustomRepository(UserRoleRepository);
   }
 
-  @Inject(RoleService)
+  @Inject(forwardRef(() => RoleService))
   private readonly roleService: RoleService;
 
-  @Inject(UserService)
+  @Inject(forwardRef(() => UserService))
   private readonly userService: UserService;
 
   public async createUserRole(
@@ -34,6 +32,6 @@ export class UserRoleService {
     userRole.userId = user.id;
     userRole.roleId = role.id;
 
-    return await this.userRoleRepository.save(userRole);
+    return this.userRoleRepository.save(userRole);
   }
 }

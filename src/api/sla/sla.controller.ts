@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/user.entity';
-import { UserService } from '../user/user.service';
 import { CreateSlaDTO, UpdateSlaDTO } from './sla.dto';
 import { SlaService } from './sla.service';
 
@@ -20,9 +19,6 @@ export class SlaController {
   @Inject(SlaService)
   private readonly slaService: SlaService;
 
-  @Inject(UserService)
-  private readonly userService: UserService;
-
   @Post('create')
   async createSla(
     @Body()
@@ -30,15 +26,16 @@ export class SlaController {
     @CurrentUser() user: User,
   ) {
     try {
-      this.userService._checkUserRole(user);
-
-      return await this.slaService.createSla({
-        company,
-        name,
-        sla,
-        typeSla,
-        description,
-      });
+      return await this.slaService.createSla(
+        {
+          company,
+          name,
+          sla,
+          typeSla,
+          description,
+        },
+        user,
+      );
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
@@ -47,7 +44,8 @@ export class SlaController {
   @Get('/:id')
   async getSlaById(@CurrentUser() user: User, @Param('id') id: string) {
     try {
-      this.userService._checkUserRole(user);
+      //TODO see if its needed
+      // this.userService._checkUserRole(user);
 
       return await this.slaService.findSlaById(id);
     } catch (error) {
@@ -71,14 +69,16 @@ export class SlaController {
     @Body() { name, sla, typeSla, description }: UpdateSlaDTO,
   ) {
     try {
-      this.userService._checkUserRole(user);
-
-      return await this.slaService.updateSla(id, {
-        name,
-        sla,
-        typeSla,
-        description,
-      });
+      return await this.slaService.updateSla(
+        id,
+        {
+          name,
+          sla,
+          typeSla,
+          description,
+        },
+        user,
+      );
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
@@ -87,9 +87,7 @@ export class SlaController {
   @Delete('delete/:id')
   async deleteSla(@CurrentUser() user: User, @Param('id') id: string) {
     try {
-      this.userService._checkUserRole(user);
-
-      return await this.slaService.deleteSla(id);
+      return await this.slaService.deleteSla(id, user);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

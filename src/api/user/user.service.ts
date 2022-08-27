@@ -1,41 +1,42 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { hash } from 'bcrypt';
-import { forEach, isEmpty } from 'lodash';
+import { isArray, isEmpty, isObject } from 'lodash';
 
 import {
-  CheckUserRole,
   CreateUserDTO,
   FindUserByEmailDTO,
+  GetUserRole,
+  MapUserRole,
   UpdateUserDTO,
   UsersByCompany,
 } from './user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
-import { UserRoleRepository } from '../user-role/user-role.repository';
 import { UserRole } from '../user-role/user-role.entity';
 import { CompanyService } from '../company/company.service';
 import { DepartmentsService } from '../departments/departments.service';
 import { RoleService } from '../role/role.service';
+import { UserRoleService } from '../user-role/user-role.service';
 
 @Injectable()
 class UserService {
   private userRepository: UserRepository;
-  private userRoleRepository: UserRoleRepository;
   constructor(private readonly connection: Connection) {
     this.userRepository = this.connection.getCustomRepository(UserRepository);
-    this.userRoleRepository =
-      this.connection.getCustomRepository(UserRoleRepository);
   }
 
-  @Inject(CompanyService)
+  @Inject(forwardRef(() => RoleService))
+  private readonly roleService: RoleService;
+
+  @Inject(forwardRef(() => UserRoleService))
+  private readonly userRoleService: UserRoleService;
+
+  @Inject(forwardRef(() => CompanyService))
   private readonly companyService: CompanyService;
 
-  @Inject(DepartmentsService)
+  @Inject(forwardRef(() => DepartmentsService))
   private readonly departmentsService: DepartmentsService;
-
-  @Inject(RoleService)
-  private readonly roleService: RoleService;
 
   public async createUser({
     name,
@@ -80,7 +81,7 @@ class UserService {
     userRole.userId = newUser.id;
     userRole.roleId = role.id;
 
-    await this.userRoleRepository.save(userRole);
+    await this.userRoleService.createUserRole(newUser.id, role.id);
 
     return newUser;
   }
@@ -179,37 +180,73 @@ class UserService {
     return user;
   }
 
-  _checkUserRole(user: User): CheckUserRole {
-    if (isEmpty(user.roles)) {
-      throw new Error('user_has_no_roles');
-    }
+  private async mapUserByRole(users: User[]): Promise<MapUserRole> {
+    const adminArray = [];
+    const analystArray = [];
+    const auditorArray = [];
 
-    const isAdmin = user.roles.some(
-      (role) => role.name === 'ADMIN' || role.name === 'SUPER_ADMIN',
-    );
+    users.forEach(async (user) => {
+      user?.roles.forEach((role) => {
+        if (role.name === 'ADMIN' || role.name === 'SUPER_ADMIN') {
+          adminArray.push(user);
+        }
+      });
 
-    const isAnalyst = user.roles.some((role) => role.name === 'ANALYST');
+      user?.roles.forEach((role) => {
+        if (role.name === 'ANALYST') {
+          analystArray.push(user);
+        }
+      });
 
-    const isAuditor = user.roles.some((role) => role.name === 'AUDITOR');
+      user?.roles.forEach((role) => {
+        if (role.name === 'AUDITOR') {
+          auditorArray.push(user);
+        }
+      });
+    });
 
-    if (isAdmin) {
+    return {
+      adminArray,
+      analystArray,
+      auditorArray,
+    };
+  }
+
+  private getUserRole(user: User): GetUserRole {
+    let isAdmin = false;
+    let isAnalyst = false;
+    let isAuditor = false;
+
+    user?.roles.forEach((role) => {
+      isAdmin = role.name.includes('ADMIN' || 'SUPER_ADMIN');
+
+      isAnalyst = role?.name.includes('ANALYST');
+
+      isAuditor = role?.name.includes('AUDITOR');
+    });
+
+    return { isAdmin, isAnalyst, isAuditor };
+  }
+
+  async _checkUserRole(user: User | User[] | any) {
+    if (isArray(user) && !isEmpty(user)) {
+      const { adminArray, analystArray, auditorArray } =
+        await this.mapUserByRole(user);
+
       return {
-        isAdmin: true,
-        message: 'User is admin',
+        adminArray,
+        analystArray,
+        auditorArray,
       };
     }
 
-    if (isAnalyst) {
-      return {
-        isAnalyst: true,
-        message: 'User is analyst',
-      };
-    }
+    if (user && isObject(user)) {
+      const { isAdmin, isAnalyst, isAuditor } = this.getUserRole(user);
 
-    if (isAuditor) {
       return {
-        isAuditor: true,
-        message: 'User is auditor',
+        isAdmin,
+        isAnalyst,
+        isAuditor,
       };
     }
 
@@ -247,9 +284,7 @@ class UserService {
     companyId: string,
     departmentId: string,
   ) {
-    const analystArray = [];
-
-    const users = await this.userRepository.find({
+    const usersArray = await this.userRepository.find({
       where: { companyId, departmentId },
       select: [
         'companyId',
@@ -263,27 +298,25 @@ class UserService {
       relations: ['roles', 'companies', 'department'],
     });
 
-    if (!users) {
+    if (!usersArray) {
       throw new Error('no_users_found');
     }
 
-    forEach(users, async (user) => {
-      const { isAnalyst } = this._checkUserRole(user);
-
-      if (isAnalyst) {
-        analystArray.push(user);
-      }
-    });
+    const { adminArray, analystArray, auditorArray } =
+      await this._checkUserRole(usersArray);
 
     return {
-      analyst: analystArray,
+      adminArray,
+      analystArray,
+      auditorArray,
     };
   }
 
   async deleteUserById(id: string, currentUser: User): Promise<object | void> {
     const userExists = await this.getUserById(id);
     const currentUserExists = await this.getUserById(currentUser?.id);
-    const { isAdmin } = this._checkUserRole(currentUserExists);
+
+    const { isAdmin } = await this._checkUserRole(currentUserExists);
 
     if (!isAdmin) {
       throw new Error('user_not_authorized');
@@ -305,10 +338,6 @@ class UserService {
   }
 
   async getAllUserByCompanyId(companyId: string): Promise<UsersByCompany> {
-    const auditorsArray = [];
-    const analystsArray = [];
-    const adminsArray = [];
-
     const users = await this.userRepository.find({
       where: { companyId },
       select: [
@@ -327,26 +356,13 @@ class UserService {
       throw new Error('no_users_found');
     }
 
-    forEach(users, async (user) => {
-      const { isAnalyst, isAuditor, isAdmin } = this._checkUserRole(user);
-
-      if (isAnalyst) {
-        analystsArray.push(user);
-      }
-
-      if (isAuditor) {
-        auditorsArray.push(user);
-      }
-
-      if (isAdmin) {
-        adminsArray.push(user);
-      }
-    });
+    const { adminArray, analystArray, auditorArray } =
+      await this._checkUserRole(users);
 
     return {
-      analysts: analystsArray,
-      auditors: auditorsArray,
-      admins: adminsArray,
+      analysts: analystArray,
+      auditors: auditorArray,
+      admins: adminArray,
     };
   }
 

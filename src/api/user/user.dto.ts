@@ -1,4 +1,5 @@
 import { Role } from '../role/role.entity';
+import { User } from './user.entity';
 
 interface CreateUserDTO {
   name: string;
@@ -22,13 +23,16 @@ interface UpdateUserDTO {
   userId: string;
 }
 
-interface CheckUserRole {
-  isAdmin?: boolean;
-  isAnalyst?: boolean;
-  isAuditor?: boolean;
-  isResponsable?: boolean;
-  isSuperAdmin?: boolean;
-  message: string;
+interface MapUserRole {
+  adminArray?: User[];
+  analystArray?: User[];
+  auditorArray?: User[];
+}
+
+interface GetUserRole {
+  isAdmin: boolean;
+  isAuditor: boolean;
+  isAnalyst: boolean;
 }
 
 interface UsersByCompany {
@@ -41,6 +45,7 @@ export {
   CreateUserDTO,
   FindUserByEmailDTO,
   UpdateUserDTO,
-  CheckUserRole,
+  MapUserRole,
   UsersByCompany,
+  GetUserRole,
 };

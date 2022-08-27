@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
+import { User } from '../user/user.entity';
+import { UserService } from '../user/user.service';
 import { CreateCompanyDTO, UpdateCompanyDTO } from './company.dto';
 import { Company } from './company.entity';
 import { CompanyRepository } from './company.repository';
@@ -12,17 +14,29 @@ class CompanyService {
       this.connection.getCustomRepository(CompanyRepository);
   }
 
-  public async createCompany({
-    cep,
-    city,
-    cnpj,
-    corporateName,
-    neighborhood,
-    number,
-    state,
-    street,
-    complement,
-  }: CreateCompanyDTO): Promise<Company> {
+  @Inject(UserService)
+  private readonly userService: UserService;
+
+  public async createCompany(
+    {
+      cep,
+      city,
+      cnpj,
+      corporateName,
+      neighborhood,
+      number,
+      state,
+      street,
+      complement,
+    }: CreateCompanyDTO,
+    user: User,
+  ): Promise<Company> {
+    const { isAdmin } = await this.userService._checkUserRole(user);
+
+    if (!isAdmin) {
+      throw new Error('user_not_admin');
+    }
+
     const company = new Company();
 
     if (!corporateName || !cnpj) {
@@ -39,10 +53,18 @@ class CompanyService {
     company.street = street;
     company.complement = complement || null;
 
-    return await this.companyRepository.save(company);
+    return this.companyRepository.save(company);
   }
 
-  public async findAllCompanies(): Promise<Company[]> {
+  public async findAllCompanies(user: User): Promise<Company[]> {
+    const userExists = await this.userService.getUserById(user?.id);
+
+    const { isAdmin } = await this.userService._checkUserRole(userExists);
+
+    if (!isAdmin) {
+      throw new Error('user_not_admin');
+    }
+
     return this.companyRepository.find({
       relations: ['tickets'],
     });
@@ -143,9 +165,7 @@ class CompanyService {
       throw new Error('company_not_found');
     }
 
-    const teste = this._mapCompanyAndTicket(companies);
-
-    return teste;
+    return this._mapCompanyAndTicket(companies);
   }
 }
 
