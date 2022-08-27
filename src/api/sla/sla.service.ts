@@ -25,13 +25,15 @@ export class SlaService {
     { company, name, sla, typeSla, description }: CreateSlaDTO,
     user: User,
   ): Promise<Sla> {
-    const newSla = new Sla();
+    const userExists = await this.userService.getUserById(user?.id);
 
-    const { isAdmin } = await this.userService._checkUserRole(user);
+    const { isAdmin } = await this.userService._checkUserRole(userExists);
 
     if (!isAdmin) {
       throw new Error('user_not_admin');
     }
+
+    const newSla = new Sla();
 
     const companyExists = await this.companyService.findCompanyById(company);
 
@@ -104,7 +106,9 @@ export class SlaService {
   }
 
   public async deleteSla(id: string, user: User): Promise<object> {
-    const { isAdmin } = await this.userService._checkUserRole(user);
+    const userExists = await this.userService.getUserById(user?.id);
+
+    const { isAdmin } = await this.userService._checkUserRole(userExists);
 
     if (!isAdmin) {
       throw new Error('user_not_admin');

@@ -54,4 +54,24 @@ export class DepartmentsService {
       relations: ['company'],
     });
   }
+
+  async deleteDeparment(id: string) {
+    const departmentExists = await this.findDepartmentById(id);
+
+    const deletedDepartment = await this.departmentsRepository.softDelete(
+      departmentExists?.id,
+    );
+
+    if (deletedDepartment) {
+      return {
+        status: 'success',
+        message: 'department_deleted',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'department_not_deleted',
+    };
+  }
 }

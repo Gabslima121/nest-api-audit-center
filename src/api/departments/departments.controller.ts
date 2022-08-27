@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Inject,
@@ -23,7 +24,7 @@ export class DepartmentsController {
     @Param('companyId') companyId: string,
   ): Promise<Departments> {
     try {
-      return this.departmentsService.createDepartment({
+      return await this.departmentsService.createDepartment({
         name,
         companyId,
         description,
@@ -43,5 +44,14 @@ export class DepartmentsController {
     @Param('companyId') companyId: string,
   ): Promise<Departments[]> {
     return this.departmentsService.findDepartmentByCompanyId(companyId);
+  }
+
+  @Delete('delete-department/:id')
+  async deleteDepartment(@Param('id') id: string) {
+    try {
+      return await this.departmentsService.deleteDeparment(id);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
   }
 }

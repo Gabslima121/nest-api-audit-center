@@ -57,7 +57,9 @@ class CompanyService {
   }
 
   public async findAllCompanies(user: User): Promise<Company[]> {
-    const { isAdmin } = await this.userService._checkUserRole(user);
+    const userExists = await this.userService.getUserById(user?.id);
+
+    const { isAdmin } = await this.userService._checkUserRole(userExists);
 
     if (!isAdmin) {
       throw new Error('user_not_admin');
