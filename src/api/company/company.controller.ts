@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Inject,
@@ -86,20 +87,17 @@ export class CompanyController {
     }
   }
 
-  //TODO Refactor
-  // @Delete('delete/:id')
-  // async deleteCompany(
-  //   // @CurrentUser() user: User,
-  //   @Param('id') id: string,
-  // ): Promise<void> {
-  //   try {
-  //     // this.userService._checkUserRole(user);
-
-  //     return this.companyService.deleteCompany(id);
-  //   } catch (error) {
-  //     throw new HttpException(error.message, 400);
-  //   }
-  // }
+  @Delete('delete/:id')
+  async deleteCompany(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+  ): Promise<void> {
+    try {
+      return this.companyService.deleteCompany(id, user);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
 
   @Get('/:id')
   async getCompanyById(@Param('id') id: string) {

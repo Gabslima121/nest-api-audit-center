@@ -100,7 +100,15 @@ class CompanyService {
     return company;
   }
 
-  public async deleteCompany(id: string): Promise<void> {
+  public async deleteCompany(id: string, user: User): Promise<void> {
+    const userExists = await this.userService.getUserById(user?.id);
+
+    const { isAdmin } = await this.userService._checkUserRole(userExists);
+
+    if (!isAdmin) {
+      throw new Error('user_not_admin');
+    }
+
     const company = await this.companyRepository.findOne({
       where: { id },
     });

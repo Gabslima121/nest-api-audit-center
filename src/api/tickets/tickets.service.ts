@@ -63,11 +63,11 @@ export class TicketsService {
       throw new Error('company_not_found');
     }
 
-    const formatedOpenDate = moment(openDate).format('DD-MM-YYYY');
-    const formatedLimitDate = moment(limitDate).format('DD-MM-YYYY');
+    const formatedOpenDate = moment(openDate).format('YYYY-MM-DD');
+    const formatedLimitDate = moment(limitDate).format('YYYY-MM-DD');
     const formatedCloseDate = !closeDate
       ? null
-      : moment(closeDate).format('DD-MM-YYYY');
+      : moment(closeDate).format('YYYY-MM-DD');
 
     ticket.analystId = analystExists?.id;
     ticket.companyId = companyExists?.id;
@@ -76,7 +76,7 @@ export class TicketsService {
     ticket.closeDate = formatedCloseDate;
     ticket.limitDate = formatedLimitDate;
     ticket.openDate =
-      formatedOpenDate || moment(new Date()).format('DD-MM-YYYY');
+      formatedOpenDate || moment(new Date()).format('YYYY-MM-DD');
     ticket.slaId = slaExists?.id;
     ticket.status = status || 'OPEN';
     ticket.title = title;
@@ -221,11 +221,13 @@ export class TicketsService {
       throw new Error('company_not_found');
     }
 
-    const formatedOpenDate = moment(openDate).format('DD-MM-YYYY');
-    const formatedLimitDate = moment(limitDate).format('DD-MM-YYYY');
+    const formatedOpenDate = moment(openDate).format('YYYY-MM-DD');
+
+    const formatedLimitDate = moment(limitDate).format('YYYY-MM-DD');
+
     const formatedCloseDate = !closeDate
       ? null
-      : moment(closeDate).format('DD-MM-YYYY');
+      : moment(closeDate).format('YYYY-MM-DD');
 
     const updatedTicket = await this.ticketsRepository.update(ticket?.id, {
       analystId: analystExists?.id,
@@ -234,11 +236,11 @@ export class TicketsService {
       responsableId: responsableExists?.id,
       closeDate: formatedCloseDate,
       limitDate: formatedLimitDate,
-      openDate: formatedOpenDate || moment(new Date()).format('DD-MM-YYYY'),
+      openDate: formatedOpenDate,
       slaId: slaExists?.id,
-      status: status || 'OPEN',
+      status: status,
       title: title,
-      description: description || null,
+      description: description,
     });
 
     if (updatedTicket) {
