@@ -74,4 +74,27 @@ export class DepartmentsService {
       message: 'department_not_deleted',
     };
   }
+
+  private _mapDepartmentsAndTicket(departments: Departments[]) {
+    return departments.map((department: Departments) => {
+      return {
+        department,
+        total: department?.tickets?.length,
+      };
+    });
+  }
+
+  public async findDepartmentsAndEachTicket(): Promise<object> {
+    const departments = await this.departmentsRepository
+      .createQueryBuilder('departments')
+      .leftJoinAndSelect('departments.tickets', 'ticket')
+      .leftJoinAndSelect('departments.company', 'company')
+      .getMany();
+
+    if (!departments) {
+      throw new Error('company_not_found');
+    }
+
+    return this._mapDepartmentsAndTicket(departments);
+  }
 }

@@ -17,6 +17,15 @@ export class DepartmentsController {
   @Inject(DepartmentsService)
   private readonly departmentsService: DepartmentsService;
 
+  @Get('departments-and-tickets')
+  async findDepartmentsAndEachTicket() {
+    try {
+      return await this.departmentsService.findDepartmentsAndEachTicket();
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
   @Post('create/:companyId')
   public async createDepartment(
     @Body()

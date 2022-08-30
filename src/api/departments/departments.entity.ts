@@ -6,12 +6,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import { Company } from '../company/company.entity';
+import { Tickets } from '../tickets/tickets.entity';
 
 @Entity('departments')
 class Departments {
@@ -42,6 +44,9 @@ class Departments {
   @DeleteDateColumn({ name: 'deleted_at' })
   @Exclude({ toPlainOnly: true })
   deletedAt: Date;
+
+  @OneToMany(() => Tickets, (ticket) => ticket.responsableArea)
+  tickets?: Tickets[];
 
   constructor() {
     if (!this.id) {
