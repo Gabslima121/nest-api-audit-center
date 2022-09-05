@@ -63,20 +63,13 @@ export class TicketsService {
       throw new Error('company_not_found');
     }
 
-    const formatedOpenDate = moment(openDate).format('YYYY-MM-DD');
-    const formatedLimitDate = moment(limitDate).format('YYYY-MM-DD');
-    const formatedCloseDate = !closeDate
-      ? null
-      : moment(closeDate).format('YYYY-MM-DD');
-
     ticket.analystId = analystExists?.id;
     ticket.companyId = companyExists?.id;
     ticket.responsableAreaId = departmentExists?.id;
     ticket.responsableId = responsableExists?.id;
-    ticket.closeDate = formatedCloseDate;
-    ticket.limitDate = formatedLimitDate;
-    ticket.openDate =
-      formatedOpenDate || moment(new Date()).format('YYYY-MM-DD');
+    ticket.closeDate = new Date(closeDate) || null;
+    ticket.limitDate = new Date(limitDate);
+    ticket.openDate = openDate || new Date(openDate);
     ticket.slaId = slaExists?.id;
     ticket.status = status || 'OPEN';
     ticket.title = title;
@@ -221,22 +214,14 @@ export class TicketsService {
       throw new Error('company_not_found');
     }
 
-    const formatedOpenDate = moment(openDate).format('YYYY-MM-DD');
-
-    const formatedLimitDate = moment(limitDate).format('YYYY-MM-DD');
-
-    const formatedCloseDate = !closeDate
-      ? null
-      : moment(closeDate).format('YYYY-MM-DD');
-
     const updatedTicket = await this.ticketsRepository.update(ticket?.id, {
       analystId: analystExists?.id,
       companyId: companyExists?.id,
       responsableAreaId: departmentExists?.id,
       responsableId: responsableExists?.id,
-      closeDate: formatedCloseDate,
-      limitDate: formatedLimitDate,
-      openDate: formatedOpenDate,
+      closeDate: new Date(closeDate) || null,
+      limitDate: new Date(limitDate),
+      openDate: new Date(openDate),
       slaId: slaExists?.id,
       status: status,
       title: title,

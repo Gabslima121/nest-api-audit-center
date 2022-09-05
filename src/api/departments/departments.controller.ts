@@ -7,6 +7,7 @@ import {
   Inject,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { CreateDepartmentDTO } from './departments.dto';
@@ -21,6 +22,17 @@ export class DepartmentsController {
   async findDepartmentsAndEachTicket() {
     try {
       return await this.departmentsService.findDepartmentsAndEachTicket();
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Get('departments-and-tickets-by-status')
+  async findCompanyAndEachTicketByStatus(@Query('status') status: string) {
+    try {
+      return await this.departmentsService.findCompanyAndEachTicketByStatus(
+        status,
+      );
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

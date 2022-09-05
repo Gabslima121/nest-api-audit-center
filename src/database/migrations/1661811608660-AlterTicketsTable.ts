@@ -7,7 +7,7 @@ export class AlterTicketsTable1661811608660 implements MigrationInterface {
       'open_date',
       new TableColumn({
         name: 'open_date',
-        type: 'date',
+        type: 'timestamptz',
         isNullable: true,
       }),
     );
@@ -17,7 +17,7 @@ export class AlterTicketsTable1661811608660 implements MigrationInterface {
       'limit_date',
       new TableColumn({
         name: 'limit_date',
-        type: 'date',
+        type: 'timestamptz',
         isNullable: true,
       }),
     );
@@ -27,7 +27,7 @@ export class AlterTicketsTable1661811608660 implements MigrationInterface {
       'close_date',
       new TableColumn({
         name: 'close_date',
-        type: 'date',
+        type: 'timestamptz',
         isNullable: true,
       }),
     );

@@ -97,4 +97,21 @@ export class DepartmentsService {
 
     return this._mapDepartmentsAndTicket(departments);
   }
+
+  public async findCompanyAndEachTicketByStatus(
+    status: string,
+  ): Promise<object> {
+    const companies = await this.departmentsRepository
+      .createQueryBuilder('departments')
+      .leftJoinAndSelect('departments.tickets', 'ticket')
+      .leftJoinAndSelect('departments.company', 'company')
+      .where('ticket.status = :status', { status })
+      .getMany();
+
+    if (!companies) {
+      throw new Error('company_not_found');
+    }
+
+    return this._mapDepartmentsAndTicket(companies);
+  }
 }

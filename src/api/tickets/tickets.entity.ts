@@ -56,13 +56,13 @@ class Tickets {
   company: Company;
 
   @Column({ name: 'open_date', default: 'now()' })
-  openDate: string;
+  openDate: Date;
 
   @Column({ name: 'limit_date' })
-  limitDate: string;
+  limitDate: Date;
 
   @Column({ name: 'close_date' })
-  closeDate: string;
+  closeDate: Date;
 
   @Column({ name: 'description', nullable: true })
   description: string;
