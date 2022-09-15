@@ -1,3 +1,5 @@
+import { Tickets } from './tickets.entity';
+
 interface CreateTicketsDTO {
   title: string;
   responsable: string;
@@ -30,4 +32,16 @@ interface UpdateTicket {
   description?: string;
 }
 
-export { CreateTicketsDTO, TicketQuery, UpdateTicket };
+interface FindAllTicketsByMainStatus {
+  pendingTickets: object;
+  openTickets: object;
+  doneTickets: object;
+  inProgressTickets: object;
+}
+
+export {
+  CreateTicketsDTO,
+  TicketQuery,
+  UpdateTicket,
+  FindAllTicketsByMainStatus,
+};

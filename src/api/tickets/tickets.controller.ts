@@ -113,6 +113,17 @@ export class TicketsController {
     return this.ticketsService.findTicketById(id);
   }
 
+  @Get('get-by-company-and-main-status/:companyId')
+  public async findAllTicketsByCompanyAndMainStatus(
+    @Param('companyId') companyId: string,
+    @Query('status') status: any,
+  ) {
+    return this.ticketsService.findAllTicketsByCompanyAndMainStatus(
+      companyId,
+      status,
+    );
+  }
+
   @Put('update-ticket/:id')
   public async updateTicket(
     @Param('id') id: string,

@@ -38,6 +38,11 @@ export class DepartmentsController {
     }
   }
 
+  @Get('departments-and-tickets-by-companyId/:companyId')
+  async findTicketsByDepartments(@Param('companyId') companyId: string) {
+    return await this.departmentsService.findTicketsByDepartments(companyId);
+  }
+
   @Post('create/:companyId')
   public async createDepartment(
     @Body()

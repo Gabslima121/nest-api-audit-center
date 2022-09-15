@@ -1,6 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Connection } from 'typeorm';
-import * as moment from 'moment';
 import 'moment/locale/pt-br';
 
 import { CompanyService } from '../company/company.service';
@@ -10,6 +9,8 @@ import { CreateTicketsDTO, UpdateTicket } from './tickets.dto';
 import { Tickets } from './tickets.entity';
 import { TicketsRepository } from './tickets.repository';
 import { SlaService } from '../sla/sla.service';
+import { AUDIT_STATUS } from '../../shared/helpers/constants';
+import { isEmpty } from 'lodash';
 
 @Injectable()
 export class TicketsService {
@@ -67,9 +68,9 @@ export class TicketsService {
     ticket.companyId = companyExists?.id;
     ticket.responsableAreaId = departmentExists?.id;
     ticket.responsableId = responsableExists?.id;
-    ticket.closeDate = new Date(closeDate) || null;
-    ticket.limitDate = new Date(limitDate);
-    ticket.openDate = openDate || new Date(openDate);
+    ticket.closeDate = closeDate;
+    ticket.limitDate = limitDate;
+    ticket.openDate = openDate;
     ticket.slaId = slaExists?.id;
     ticket.status = status || 'OPEN';
     ticket.title = title;
@@ -276,7 +277,7 @@ export class TicketsService {
         'tickets.title',
         'responsableArea.id',
         'responsableArea.name',
-        ' company.id',
+        'company.id',
         'company.corporateName',
       ])
       .leftJoin('tickets.responsableArea', 'responsableArea')
@@ -288,5 +289,102 @@ export class TicketsService {
     }
 
     return tickets;
+  }
+
+  private checkIfTicketArrayIsEmpty({
+    doneTickets,
+    openTickets,
+    pendingTickets,
+    inProgressTickets,
+  }) {
+    const result = [];
+
+    result.push(!isEmpty(openTickets) ? openTickets : {});
+    result.push(!isEmpty(pendingTickets) ? pendingTickets : {});
+    result.push(!isEmpty(doneTickets) ? doneTickets : {});
+    result.push(!isEmpty(inProgressTickets) ? inProgressTickets : {});
+
+    return result;
+  }
+
+  private async buildResponseToMountTicketsByStatusChart(tickets) {
+    let doneTickets = {};
+    let openTickets = {};
+    let pendingTickets = {};
+    let inProgressTickets = {};
+
+    const totalDone = [];
+    const totalPending = [];
+    const totalOpen = [];
+    const totalInProgress = [];
+
+    tickets.forEach((ticket: any) => {
+      if (ticket?.status === AUDIT_STATUS.PENDING) {
+        totalPending.push(ticket);
+        pendingTickets = {
+          status: ticket?.status,
+          total: totalPending.length,
+        };
+      }
+
+      if (ticket?.status === AUDIT_STATUS.DONE) {
+        totalDone.push(ticket);
+        doneTickets = {
+          status: ticket?.status,
+          total: totalDone.length,
+        };
+      }
+
+      if (ticket?.status === AUDIT_STATUS.OPEN) {
+        totalOpen.push(ticket);
+        openTickets = {
+          status: ticket?.status,
+          total: totalOpen.length,
+        };
+      }
+
+      if (ticket?.status === AUDIT_STATUS.IN_PROGRESS) {
+        totalInProgress.push(ticket);
+
+        inProgressTickets = {
+          status: ticket?.status,
+          total: totalInProgress.length,
+        };
+      }
+    });
+
+    const result = this.checkIfTicketArrayIsEmpty({
+      doneTickets,
+      openTickets,
+      pendingTickets,
+      inProgressTickets,
+    });
+
+    return result;
+  }
+
+  public async findAllTicketsByCompanyAndMainStatus(
+    companyId: string,
+    status?: any,
+  ) {
+    const tickets = await this.ticketsRepository
+      .createQueryBuilder('tickets')
+      .select([
+        'tickets.title',
+        'tickets.id',
+        'tickets.status',
+        'company.corporateName',
+        'company.id',
+      ])
+      .where('tickets.status IN (:...status)', {
+        status,
+      })
+      .andWhere('tickets.companyId = :companyId', { companyId })
+      .leftJoin('tickets.company', 'company')
+      .getMany();
+
+    const result = await this.buildResponseToMountTicketsByStatusChart(tickets);
+
+    return result;
   }
 }

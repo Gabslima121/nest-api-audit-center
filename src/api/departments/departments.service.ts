@@ -114,4 +114,20 @@ export class DepartmentsService {
 
     return this._mapDepartmentsAndTicket(companies);
   }
+
+  public async findTicketsByDepartments(companyId: string) {
+    const departments = await this.departmentsRepository
+      .createQueryBuilder('departments')
+      .select([
+        'departments.name',
+        'departments.id',
+        'tickets.title',
+        'tickets.responsableArea',
+      ])
+      .leftJoin('departments.tickets', 'tickets')
+      .where('departments.companyId = :companyId', { companyId })
+      .getMany();
+
+    return this._mapDepartmentsAndTicket(departments);
+  }
 }

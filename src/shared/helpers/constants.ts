@@ -11,3 +11,12 @@ export const ROLES = {
   ANALYST: 'ANALYST',
   AUDITOR: 'AUDITOR',
 };
+
+export const AUDIT_STATUS = {
+  OPEN: 'OPEN',
+  DONE: 'DONE',
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN PROGRESS',
+  CANCELED: 'CANCELED',
+  REVIEW: 'REVIEW',
+};
