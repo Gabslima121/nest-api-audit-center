@@ -30,6 +30,15 @@ export class TicketsController {
     }
   }
 
+  @Get('/tickets-by-user-and-status')
+  public async findTicketsByUserAndStatus(@CurrentUser() user: User) {
+    try {
+      return await this.ticketsService.findTicketsByUserAndStatus(user);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
   @Post('create')
   public async createTicket(
     @Body()
@@ -87,7 +96,11 @@ export class TicketsController {
     @CurrentUser() user: User,
   ): Promise<Tickets[]> {
     try {
-      return this.ticketsService.findTicketsByAnalystId(user?.id);
+      const { data } = await this.ticketsService.findTicketsByAnalystId(
+        user?.id,
+      );
+
+      return data.tickets;
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

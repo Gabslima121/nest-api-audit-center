@@ -11,6 +11,7 @@ import { TicketsRepository } from './tickets.repository';
 import { SlaService } from '../sla/sla.service';
 import { AUDIT_STATUS } from '../../shared/helpers/constants';
 import { isEmpty } from 'lodash';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class TicketsService {
@@ -140,7 +141,12 @@ export class TicketsService {
       throw new Error('ticket_not_found');
     }
 
-    return tickets;
+    const total = tickets.length;
+
+    return {
+      data: { tickets },
+      total,
+    };
   }
 
   public async findTicketById(id: string): Promise<Tickets> {
@@ -386,5 +392,33 @@ export class TicketsService {
     const result = await this.buildResponseToMountTicketsByStatusChart(tickets);
 
     return result;
+  }
+
+  public async findTicketsByUserAndStatus(user: User) {
+    const userExists = await this.userService.getUserById(user?.id);
+
+    const { isAnalyst, isAuditor } = await this.userService._checkUserRole(
+      userExists,
+    );
+
+    if (isAuditor) {
+      const { data } = await this.findTicketsByResponsableId(userExists?.id);
+
+      const result = await this.buildResponseToMountTicketsByStatusChart(
+        data?.tickets,
+      );
+
+      return result;
+    }
+
+    if (isAnalyst) {
+      const { data } = await this.findTicketsByAnalystId(userExists?.id);
+
+      const result = await this.buildResponseToMountTicketsByStatusChart(
+        data?.tickets,
+      );
+
+      return result;
+    }
   }
 }
