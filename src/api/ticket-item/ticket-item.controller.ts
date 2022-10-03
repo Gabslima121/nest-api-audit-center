@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Inject,
@@ -18,16 +19,14 @@ export class TicketItemController {
   @Post('create/:ticketId')
   async createTicketItem(
     @Body()
-    { item, status, description }: CreateTicketItem,
+    ticketItems: [],
     @Param('ticketId') ticketId: string,
   ) {
     try {
-      return await this.ticketItemService.createTicketItem({
-        item,
-        status,
+      return await this.ticketItemService.createTicketItem(
+        { ...ticketItems },
         ticketId,
-        description,
-      });
+      );
     } catch (error) {
       throw new HttpException(error.message, 400);
     }
@@ -37,6 +36,15 @@ export class TicketItemController {
   async findTicketItemsByTicketId(@Param('ticketId') ticketId: string) {
     try {
       return await this.ticketItemService.findTicketItemsByTicketId(ticketId);
+    } catch (error) {
+      throw new HttpException(error.message, 400);
+    }
+  }
+
+  @Delete('delete/:id')
+  async deleteTicketItem(@Param('id') id: string) {
+    try {
+      return await this.ticketItemService.deleteTicketItem(id);
     } catch (error) {
       throw new HttpException(error.message, 400);
     }

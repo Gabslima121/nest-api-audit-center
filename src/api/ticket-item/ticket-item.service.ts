@@ -18,24 +18,26 @@ export class TicketItemService {
   @Inject(TicketsService)
   private readonly ticketsService: TicketsService;
 
-  public async createTicketItem({
-    item,
-    status,
-    ticketId,
-    description,
-  }: CreateTicketItem): Promise<TicketItems> {
-    const ticketItem = new TicketItems();
-
+  public async createTicketItem(
+    ticketItemData: any,
+    ticketId: string,
+  ): Promise<TicketItems> {
     const ticketExists = await this.ticketsService.findTicketById(ticketId);
 
     if (!ticketExists) throw new Error('ticket_not_found');
 
-    ticketItem.item = item;
-    ticketItem.status = status || TICKET_ITEM_STATUS.PENDING;
-    ticketItem.ticketId = ticketExists?.id;
-    ticketItem.description = description || null;
+    const test = ticketItemData?.ticketItems.map((item: any) => {
+      const ticketItem = new TicketItems();
 
-    return this.ticketItemRepository.save(ticketItem);
+      ticketItem.item = item?.item;
+      ticketItem.status = item?.status || TICKET_ITEM_STATUS.PENDING;
+      ticketItem.ticketId = ticketExists?.id;
+      ticketItem.description = item?.description || null;
+
+      return ticketItem;
+    });
+
+    return this.ticketItemRepository.save(test);
   }
 
   public async findTicketItemsByTicketId(
@@ -49,5 +51,27 @@ export class TicketItemService {
     if (!ticketItems) throw new Error('ticket_not_found');
 
     return ticketItems;
+  }
+
+  public async deleteTicketItem(ticketItemId: string) {
+    const ticketItemExists = await this.ticketItemRepository.findOne({
+      where: { id: ticketItemId },
+    });
+
+    const deletedTicketItem = await this.ticketItemRepository.softDelete(
+      ticketItemExists?.id,
+    );
+
+    if (deletedTicketItem) {
+      return {
+        status: 'success',
+        message: 'ticket_item_deleted',
+      };
+    }
+
+    return {
+      status: 'error',
+      message: 'ticket_item_not_deleted',
+    };
   }
 }
